@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#0b1018" />
+    <meta name="description" content="Icy Rose Exchange — shop sales, customer buying offers, cash counts, and current prices." />
+    <title>Icy Rose Exchange | Shop Dashboard</title>
+    <link rel="icon" href="assets/favicon.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="styles.css" />
+    <script src="app.js" defer></script>
+  </head>
+  <body>
+    <div class="app-shell">
+      <aside class="sidebar" aria-label="Main navigation">
+        <div class="brand-area">
+          <img class="brand-logo" src="assets/icy-rose-logo.png" alt="Icy Rose Exchange" />
+          <div class="brand-caption"><span class="live-dot"></span> SHOP CONTROL PANEL</div>
+        </div>
+        <nav class="navigation" aria-label="Pages">
+          <button class="nav-item selected" data-view="pawn" type="button"><span class="nav-icon" aria-hidden="true">▣</span><span>Pawn Shop</span><span class="nav-arrow">›</span></button>
+          <button class="nav-item" data-view="buying" type="button"><span class="nav-icon" aria-hidden="true">⇄</span><span>Buying Calculator</span><span class="nav-arrow">›</span></button>
+          <button class="nav-item" data-view="cash" type="button"><span class="nav-icon" aria-hidden="true">＄</span><span>Cash Calculator</span><span class="nav-arrow">›</span></button>
+          <button class="nav-item" data-view="prices" type="button"><span class="nav-icon" aria-hidden="true">≡</span><span>Items & Prices</span><span class="nav-arrow">›</span></button>
+        </nav>
+        <div class="sidebar-footer">
+          <div class="source-pill"><span class="live-dot"></span> EXCEL-POWERED PRICES</div>
+          <p>Update the workbook on GitHub to refresh this site for everyone.</p>
+          <span id="data-updated">Loading prices…</span>
+        </div>
+      </aside>
+      <div class="main-wrap">
+        <header class="topbar">
+          <div class="topbar-left"><span class="topbar-label">ICY ROSE EXCHANGE</span><span class="topbar-sep">/</span><span id="current-section">Pawn Shop</span></div>
+          <span class="topbar-status"><span class="live-dot"></span> PRICE LIST ACTIVE</span>
+        </header>
+        <main id="app" tabindex="-1">
+          <div class="loading-view"><span class="loading-ring"></span><p>Loading your shop data…</p></div>
+        </main>
+        <footer class="main-footer">ICY ROSE EXCHANGE <span>•</span> Powered by your Excel workbook <span>•</span> Prices per unit in $</footer>
+      </div>
+    </div>
+    <div id="toast" class="toast" role="status" aria-live="polite"></div>
+  </body>
+</html>
