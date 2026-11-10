@@ -1,0 +1,50 @@
+name: Publish Icy Rose Exchange site
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'source/**'
+      - 'site/**'
+      - 'scripts/**'
+      - '.github/workflows/deploy.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: github-pages
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Refresh prices from workbook
+        run: python scripts/build_data.py source/prices.xlsx site/data/prices.json
+
+      - name: Configure GitHub Pages
+        uses: actions/configure-pages@v5
+
+      - name: Upload static website
+        uses: actions/upload-pages-artifact@v4
+        with:
+          path: site
+
+      - name: Publish GitHub Pages
+        uses: actions/deploy-pages@v4
+        id: deployment
