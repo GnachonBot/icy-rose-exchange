@@ -12,6 +12,11 @@ let catalogue = [];
 let lookup = new Map();
 let currentView = "pawn";
 let toastTimer;
+let orderPosting = false;
+const RECEIPT_LIMIT = 50;
+const MAX_RECEIPT_QTY = 10000;
+const MAX_RECEIPT_PRICE = 10000000;
+const receiptEndpoint = String(window.ICY_ROSE_CONFIG?.receiptEndpoint || "").trim();
 const APP = document.getElementById("app");
 
 const localKey = "icy-rose-shop-v1";
@@ -107,7 +112,7 @@ function addItem(mode,id,qty=1) {
   if(!product) return;
   const cart=cartFor(mode);
   const prior=cart.find(x=>x.id===id);
-  if(prior) prior.qty=Math.min(999999,prior.qty+qty);
+  if(prior) prior.qty=Math.min(MAX_RECEIPT_QTY,prior.qty+qty);
   else cart.push({id,qty,override:null});
   persist();
   setView(mode);
@@ -122,12 +127,17 @@ function renderCart(mode) {
     <div class="workspace">
       <section class="card">
         <div class="card-header"><div><h2 class="card-title">${isPawn?"Customer sale":"Customer buying order"}</h2><p class="card-subtitle">Select a product or material, then add a quantity.</p></div><span class="tag ${isPawn?"":"tag-rose"}">${summary.lines.length} lines</span></div>
-        <div class="card-body"><form id="add-form" class="add-form" autocomplete="off"><div><label class="form-label" for="product-search">Search items & materials</label><input id="product-search" class="input" type="search" placeholder="Type or choose an item…" required></div><div><label class="form-label" for="product-qty">Quantity</label><input id="product-qty" class="input qty-field" type="number" min="1" step="1" value="1" required></div><button class="btn btn-primary" type="submit">＋ Add item</button></form><div id="list-holder"></div></div>
+        <div class="card-body"><form id="add-form" class="add-form" autocomplete="off"><div><label class="form-label" for="product-search">Search items & materials</label><input id="product-search" class="input" type="search" placeholder="Type or choose an item…" required></div><div><label class="form-label" for="product-qty">Quantity</label><input id="product-qty" class="input qty-field" type="number" min="1" max="10000" step="1" value="1" required></div><button class="btn btn-primary" type="submit">＋ Add item</button></form><div id="list-holder"></div></div>
       </section>
       <aside class="card"><div class="card-header"><div><h2 class="card-title">Order summary</h2><p class="card-subtitle">${isPawn?"Customer pays you":"You pay the customer"}</p></div></div>
         <div class="checkout"><div class="form-label">${label}</div><div class="checkout-total ${isPawn?"money-ice":"money-rose"}">${currency(summary.total)}</div>
           <div class="summary-rows"><div class="summary-row"><span>Item lines</span><strong>${summary.lines.length}</strong></div><div class="summary-row"><span>Total units</span><strong>${summary.units}</strong></div><div class="summary-row"><span>Unpriced items</span><strong>${summary.unset}</strong></div></div>
-          <div class="checkout-actions"><button type="button" id="copy-receipt" class="btn btn-ice">Copy order</button><button type="button" id="clear-cart" class="btn btn-danger">Clear cart</button></div>
+          <div class="receipt-controls">
+            <label class="form-label" for="receipt-pin">Staff receipt passphrase</label>
+            <input id="receipt-pin" class="input" type="password" autocomplete="off" placeholder="Enter passphrase to send" aria-describedby="receipt-help" />
+            <p class="hint" id="receipt-help">${receiptEndpoint ? "Complete an order to post its receipt to Discord. Passphrase is never saved." : "Discord isn't connected yet. Set your Worker URL in site/config.js."}</p>
+          </div>
+          <div class="checkout-actions"><button type="button" id="complete-order" class="btn btn-primary" ${receiptEndpoint ? "" : "disabled"}>✓ Complete order &amp; send receipt</button><button type="button" id="copy-receipt" class="btn btn-ice">Copy order</button><button type="button" id="clear-cart" class="btn btn-danger">Clear cart</button></div>
         </div>
       </aside>
     </div>`;
@@ -138,7 +148,7 @@ function renderCart(mode) {
     const product=findProduct(addInput.value);
     if(!product) { notify("Choose a valid item from the suggestions."); addInput.focus(); return; }
     const qty=Math.floor(Number(document.getElementById("product-qty").value));
-    if(!Number.isFinite(qty)||qty<1) {notify("Enter a quantity of at least 1.");return;}
+    if(!Number.isFinite(qty)||qty<1||qty>MAX_RECEIPT_QTY) {notify("Enter a quantity of at least 1.");return;}
     addItem(mode,product.id,qty);
   });
   document.getElementById("clear-cart").addEventListener("click",()=>{
@@ -147,6 +157,7 @@ function renderCart(mode) {
     cartFor(mode).length=0;persist();setView(mode);notify("Cart cleared");
   });
   document.getElementById("copy-receipt").addEventListener("click",()=>copyReceipt(mode));
+  document.getElementById("complete-order").addEventListener("click",()=>completeOrder(mode));
   renderCartTable(mode);
 }
 function renderCartTable(mode) {
@@ -163,13 +174,13 @@ function renderCartTable(mode) {
   lines.forEach(line=>{
     const tr=node("tr");
     const tdName=node("td");tdName.append(node("span","product-name",line.item.displayName),node("span","product-sub",line.item.group));tr.append(tdName);
-    const tdQty=node("td");const qty=node("input","input numeric-input");qty.type="number";qty.min="1";qty.step="1";qty.value=line.qty;qty.setAttribute("aria-label",`Quantity for ${line.item.displayName}`);tdQty.append(qty);tr.append(tdQty);
+    const tdQty=node("td");const qty=node("input","input numeric-input");qty.type="number";qty.min="1";qty.max=String(MAX_RECEIPT_QTY);qty.step="1";qty.value=line.qty;qty.setAttribute("aria-label",`Quantity for ${line.item.displayName}`);tdQty.append(qty);tr.append(tdQty);
     const tdUnit=node("td","money money-ice",currency(priceFor(line.item,mode)));tr.append(tdUnit);
     const tdOverride=node("td");const override=node("input","input numeric-input price-override");override.type="number";override.min="0";override.step="0.01";override.placeholder="Default";override.value=line.override===null||line.override===undefined?"":line.override;override.setAttribute("aria-label",`Custom unit price for ${line.item.displayName}`);tdOverride.append(override);tr.append(tdOverride);
     const tdTotal=node("td",line.unit===null?"amount-warning":"money money-rose",line.total===null?"Not set":currency(line.total));tr.append(tdTotal);
     const tdRemove=node("td");const remove=node("button","icon-button","×");remove.type="button";remove.title=`Remove ${line.item.displayName}`;tdRemove.append(remove);tr.append(tdRemove);
     const row=cartFor(mode).find(x=>x.id===line.item.id);
-    qty.addEventListener("change",()=>{const value=Math.floor(Number(qty.value));row.qty=Number.isFinite(value)?Math.max(1,value):1;persist();setView(mode);});
+    qty.addEventListener("change",()=>{const value=Math.floor(Number(qty.value));row.qty=Number.isFinite(value)?Math.min(MAX_RECEIPT_QTY,Math.max(1,value)):1;persist();setView(mode);});
     override.addEventListener("change",()=>{
       if(override.value.trim()==="")row.override=null;
       else {const value=Number(override.value);if(!Number.isFinite(value)||value<0){notify("Price must be zero or more.");return;}row.override=Math.round(value*100)/100;}
@@ -181,6 +192,57 @@ function renderCartTable(mode) {
   table.append(tbody);scroll.append(table);holder.append(scroll);
   holder.append(node("p","hint","Custom price is optional and applies only to this order, not to the workbook."));
 }
+async function completeOrder(mode) {
+  if (orderPosting) return;
+  const summary = cartMetrics(mode);
+  if (!summary.lines.length) { notify("Add items before completing an order."); return; }
+  if (summary.lines.length > RECEIPT_LIMIT) { notify(`Receipts support up to ${RECEIPT_LIMIT} different items. Split the order.`); return; }
+  if (summary.lines.some(l => !Number.isInteger(l.qty) || l.qty < 1 || l.qty > MAX_RECEIPT_QTY || !Number.isFinite(l.unit) || l.unit < 0 || l.unit > MAX_RECEIPT_PRICE)) {
+    notify("Set a valid quantity and price for every item before completing."); return;
+  }
+  if (!receiptEndpoint) { notify("Discord isn't connected. Set the Worker URL in site/config.js."); return; }
+  const passphraseInput = document.getElementById("receipt-pin");
+  const passphrase = passphraseInput?.value || "";
+  if (!passphrase.trim()) { notify("Enter your staff receipt passphrase first."); passphraseInput?.focus(); return; }
+  if (!confirm(`Complete this ${mode === "pawn" ? "customer sale" : "customer purchase"} for ${currency(summary.total)} and post a receipt in Discord?`)) return;
+
+  const button = document.getElementById("complete-order");
+  orderPosting = true;
+  button.disabled = true;
+  button.textContent = "Sending receipt…";
+  const payload = {
+    kind: mode,
+    orderId: crypto.randomUUID(),
+    items: summary.lines.map(l => ({name: l.item.displayName, qty: l.qty, unitPrice: Math.round(l.unit * 100) / 100})),
+    clientTotal: Math.round(summary.total * 100) / 100
+  };
+  try {
+    const response = await fetch(receiptEndpoint, {
+      method: "POST",
+      headers: {"Content-Type": "application/json", "X-Receipt-Pin": passphrase},
+      body: JSON.stringify(payload),
+      signal: AbortSignal.timeout(15000)
+    });
+    let result = {};
+    try { result = await response.json(); } catch {}
+    if (!response.ok || !result.ok) throw new Error(result.error || `Server returned ${response.status}`);
+    // Discord accepted the message. Only clear this cart on confirmed success.
+    const cart = cartFor(mode);
+    cart.length = 0;
+    persist();
+    setView(mode);
+    notify(`Order complete. Receipt ${result.receiptId || ""} posted to Discord!`);
+  } catch (error) {
+    notify(`Receipt not confirmed: ${error.message || "Connection failed"}. Cart kept.`);
+    // If the network drops after Discord accepted the receipt, checking the
+    // channel before retrying avoids a possible duplicate.
+    button.disabled = false;
+    button.textContent = "✓ Complete order & send receipt";
+  } finally {
+    orderPosting = false;
+  }
+}
+
 async function copyReceipt(mode) {
   const sum=cartMetrics(mode);
   if(!sum.lines.length){notify("Add items before copying an order.");return;}
