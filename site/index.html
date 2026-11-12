@@ -4,11 +4,12 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="theme-color" content="#0b1018" />
-    <meta name="description" content="Icy Rose Exchange — shop sales, customer buying offers, cash counts, and current prices." />
+    <meta name="description" content="Icy Rose Exchange — shop sales, bulk crafting orders, shared inventory, cash counts, and current prices." />
     <title>Icy Rose Exchange | Shop Dashboard</title>
     <link rel="icon" href="assets/favicon.svg" type="image/svg+xml" />
     <link rel="stylesheet" href="styles.css" />
     <script src="config.js" defer></script>
+    <script src="operations.js" defer></script>
     <script src="app.js" defer></script>
   </head>
   <body>
@@ -21,6 +22,8 @@
         <nav class="navigation" aria-label="Pages">
           <button class="nav-item selected" data-view="pawn" type="button"><span class="nav-icon" aria-hidden="true">▣</span><span>Pawn Shop</span><span class="nav-arrow">›</span></button>
           <button class="nav-item" data-view="buying" type="button"><span class="nav-icon" aria-hidden="true">⇄</span><span>Buying Calculator</span><span class="nav-arrow">›</span></button>
+          <button class="nav-item" data-view="bulk" type="button"><span class="nav-icon" aria-hidden="true">▤</span><span>Bulk Orders</span><span class="nav-arrow">›</span></button>
+          <button class="nav-item" data-view="inventory" type="button"><span class="nav-icon" aria-hidden="true">◫</span><span>Inventory</span><span class="nav-arrow">›</span></button>
           <button class="nav-item" data-view="cash" type="button"><span class="nav-icon" aria-hidden="true">＄</span><span>Cash Calculator</span><span class="nav-arrow">›</span></button>
           <button class="nav-item" data-view="prices" type="button"><span class="nav-icon" aria-hidden="true">≡</span><span>Items & Prices</span><span class="nav-arrow">›</span></button>
         </nav>

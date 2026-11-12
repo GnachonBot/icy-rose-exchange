@@ -3,6 +3,8 @@
 const VIEWS = {
   pawn: { title: "Pawn Shop", eyebrow: "SHOP / CUSTOMER SALES", subtitle: "Build a customer order. Choose items, set quantities, and the total updates instantly.", chip: "Selling to customers" },
   buying: { title: "Buying Calculator", eyebrow: "SHOP / CUSTOMER PURCHASES", subtitle: "Work out exactly what to pay customers, using your fixed buying prices and custom item offers.", chip: "Buying from customers" },
+  bulk: { title: "Bulk Orders", eyebrow: "SHOP / ORDERS & CRAFTING", subtitle: "Plan customer orders, calculate exact materials, and notify Discord when an order is placed.", chip: "Live crafting requirements" },
+  inventory: { title: "Inventory", eyebrow: "SHOP / SHARED STOCK", subtitle: "Count finished goods and materials. Sales deduct stock, purchases add stock, and crafting uses materials.", chip: "Shared through Cloudflare" },
   cash: { title: "Cash Calculator", eyebrow: "SHOP / CASH COUNTER", subtitle: "Count Stacks and Rolls together, even when each one has a different value.", chip: "Two cash types" },
   prices: { title: "Items & Prices", eyebrow: "SHOP / LIVE PRICE LIST", subtitle: "Browse every item and material from the latest Excel workbook, with separate selling and buying prices.", chip: "Linked to your workbook" }
 };
@@ -26,12 +28,17 @@ const state = {
   pawnCart: Array.isArray(saved.pawnCart) ? saved.pawnCart : [],
   buyingCart: Array.isArray(saved.buyingCart) ? saved.buyingCart : [],
   cash: saved.cash || {},
+  bulkDraft: Array.isArray(saved.bulkDraft) ? saved.bulkDraft : [],
+  bulkCustomer: saved.bulkCustomer || "",
+  bulkNotes: saved.bulkNotes || "",
+  bulkRequestId: saved.bulkRequestId || null,
+  pendingReceiptIds: saved.pendingReceiptIds || {},
   priceFilter: "All",
   priceSearch: ""
 };
 
 function persist() {
-  try { localStorage.setItem(localKey, JSON.stringify({pawnCart:state.pawnCart,buyingCart:state.buyingCart,cash:state.cash})); } catch {}
+  try { localStorage.setItem(localKey, JSON.stringify({pawnCart:state.pawnCart,buyingCart:state.buyingCart,cash:state.cash,bulkDraft:state.bulkDraft,bulkCustomer:state.bulkCustomer,bulkNotes:state.bulkNotes,bulkRequestId:state.bulkRequestId,pendingReceiptIds:state.pendingReceiptIds})); } catch {}
 }
 function currency(num) {
   if (num === null || num === undefined || !Number.isFinite(Number(num))) return "Not set";
@@ -58,6 +65,7 @@ function priceFor(product, mode) {
   return mode === "pawn" ? product.shopPrice : product.buyPrice;
 }
 function cartFor(mode) { return mode === "pawn" ? state.pawnCart : state.buyingCart; }
+function resetPendingReceipt(mode) { delete state.pendingReceiptIds[mode]; }
 function getLine(mode, entry) {
   const item=lookup.get(entry.id);
   if (!item) return null;
@@ -85,6 +93,8 @@ function setView(name) {
   });
   document.getElementById("current-section").textContent=VIEWS[name].title;
   if(name==="pawn" || name==="buying") renderCart(name);
+  else if(name==="bulk") renderBulk();
+  else if(name==="inventory") renderInventory();
   else if(name==="cash") renderCash();
   else renderPrices();
 }
@@ -114,6 +124,7 @@ function addItem(mode,id,qty=1) {
   const prior=cart.find(x=>x.id===id);
   if(prior) prior.qty=Math.min(MAX_RECEIPT_QTY,prior.qty+qty);
   else cart.push({id,qty,override:null});
+  resetPendingReceipt(mode);
   persist();
   setView(mode);
   notify(`${product.displayName} added to ${mode==="pawn"?"sales":"buying"} cart`);
@@ -154,7 +165,7 @@ function renderCart(mode) {
   document.getElementById("clear-cart").addEventListener("click",()=>{
     if(!cartFor(mode).length)return;
     if(!confirm("Clear this cart?"))return;
-    cartFor(mode).length=0;persist();setView(mode);notify("Cart cleared");
+    cartFor(mode).length=0;resetPendingReceipt(mode);persist();setView(mode);notify("Cart cleared");
   });
   document.getElementById("copy-receipt").addEventListener("click",()=>copyReceipt(mode));
   document.getElementById("complete-order").addEventListener("click",()=>completeOrder(mode));
@@ -180,13 +191,13 @@ function renderCartTable(mode) {
     const tdTotal=node("td",line.unit===null?"amount-warning":"money money-rose",line.total===null?"Not set":currency(line.total));tr.append(tdTotal);
     const tdRemove=node("td");const remove=node("button","icon-button","×");remove.type="button";remove.title=`Remove ${line.item.displayName}`;tdRemove.append(remove);tr.append(tdRemove);
     const row=cartFor(mode).find(x=>x.id===line.item.id);
-    qty.addEventListener("change",()=>{const value=Math.floor(Number(qty.value));row.qty=Number.isFinite(value)?Math.min(MAX_RECEIPT_QTY,Math.max(1,value)):1;persist();setView(mode);});
+    qty.addEventListener("change",()=>{const value=Math.floor(Number(qty.value));row.qty=Number.isFinite(value)?Math.min(MAX_RECEIPT_QTY,Math.max(1,value)):1;resetPendingReceipt(mode);persist();setView(mode);});
     override.addEventListener("change",()=>{
       if(override.value.trim()==="")row.override=null;
       else {const value=Number(override.value);if(!Number.isFinite(value)||value<0){notify("Price must be zero or more.");return;}row.override=Math.round(value*100)/100;}
-      persist();setView(mode);
+      resetPendingReceipt(mode);persist();setView(mode);
     });
-    remove.addEventListener("click",()=>{const cart=cartFor(mode);cart.splice(cart.findIndex(x=>x.id===line.item.id),1);persist();setView(mode);});
+    remove.addEventListener("click",()=>{const cart=cartFor(mode);cart.splice(cart.findIndex(x=>x.id===line.item.id),1);resetPendingReceipt(mode);persist();setView(mode);});
     tbody.append(tr);
   });
   table.append(tbody);scroll.append(table);holder.append(scroll);
@@ -210,10 +221,12 @@ async function completeOrder(mode) {
   orderPosting = true;
   button.disabled = true;
   button.textContent = "Sending receipt…";
+  state.pendingReceiptIds[mode] ||= crypto.randomUUID();
+  persist();
   const payload = {
     kind: mode,
-    orderId: crypto.randomUUID(),
-    items: summary.lines.map(l => ({name: l.item.displayName, qty: l.qty, unitPrice: Math.round(l.unit * 100) / 100})),
+    orderId: state.pendingReceiptIds[mode],
+    items: summary.lines.map(l => ({id:l.item.id, name: l.item.displayName, qty: l.qty, unitPrice: Math.round(l.unit * 100) / 100})),
     clientTotal: Math.round(summary.total * 100) / 100
   };
   try {
@@ -226,12 +239,16 @@ async function completeOrder(mode) {
     let result = {};
     try { result = await response.json(); } catch {}
     if (!response.ok || !result.ok) throw new Error(result.error || `Server returned ${response.status}`);
-    // Discord accepted the message. Only clear this cart on confirmed success.
+    staffPin = passphrase;
+    // Stock updates and Discord posting are reported separately by the Worker.
     const cart = cartFor(mode);
     cart.length = 0;
+    resetPendingReceipt(mode);
     persist();
     setView(mode);
-    notify(`Order complete. Receipt ${result.receiptId || ""} posted to Discord!`);
+    if(result.stockUpdated && staffPin){try{await loadRemoteStock();}catch{}}
+    notify(result.discordPosted ? `Order complete! Discord receipt sent; inventory updated.` :
+      `Order completed${result.stockUpdated?" and stock updated":""}, but Discord was not confirmed. Check the channel.`);
   } catch (error) {
     notify(`Receipt not confirmed: ${error.message || "Connection failed"}. Cart kept.`);
     // If the network drops after Discord accepted the receipt, checking the

@@ -162,3 +162,30 @@ main{width:100%;max-width:1400px;margin:0 auto;padding:34px clamp(20px,4vw,56px)
 .receipt-controls .hint{margin:9px 0 0;line-height:1.5}
 .receipt-controls .input{min-height:42px}
 .checkout-actions #complete-order{min-height:48px;font-size:13px}
+
+/* Bulk orders + inventory: shared stock management */
+.two-panel{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:20px;align-items:start}
+.form-stack{display:grid;gap:16px}
+.form-stack button{width:100%}
+.grid-fields{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+.unlock-card{max-width:670px;margin:40px auto}
+.unlock-card h2{font-size:26px;margin:6px 0 8px}
+.unlock-card .card-subtitle{margin:0 0 20px}
+.unlock-row{display:flex;gap:11px;margin-bottom:14px}
+.unlock-row .input{flex:1;min-width:0}
+.narrow-select{max-width:195px}
+.negative-stock{color:#ff8ca6!important;font-weight:850;white-space:nowrap;font-variant-numeric:tabular-nums}
+.danger-note{color:#ffb3bd;border-color:#7b3445;background:rgba(143,37,61,.12);margin-top:14px}
+.bulk-history-item{border:1px solid #293948;border-radius:11px;padding:17px 18px;background:#111b26;margin-bottom:13px}
+.bulk-history-item:last-child{margin-bottom:0}
+.bulk-history-head{display:flex;align-items:start;justify-content:space-between;gap:14px}
+.bulk-history-head strong{font-size:15px}
+.bulk-history-head .product-sub{margin:6px 0}
+.bulk-order-lines{font-size:13px;color:#d1e3ee;line-height:1.55;margin:8px 0}
+.status-pill{border-radius:30px;padding:4px 9px;font-size:10px;font-weight:850;letter-spacing:.04em;display:inline-block;margin-left:7px;border:1px solid #795c29;color:#f5d48c;background:#322d1b}
+.status-pill.fulfilled{color:#99f0dc;background:#183c35;border-color:#276858}
+.status-pill.cancelled{color:#ffb1bd;background:#41212e;border-color:#864253}
+.history-actions{display:flex;gap:9px;margin-top:14px;flex-wrap:wrap}
+.history-actions .btn{min-height:36px}
+@media(max-width:1100px){.two-panel{grid-template-columns:1fr}}
+@media(max-width:630px){.unlock-row{display:grid}.grid-fields{grid-template-columns:1fr}.bulk-history-head{flex-direction:column}.narrow-select{max-width:100%}}
