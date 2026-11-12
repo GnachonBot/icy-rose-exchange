@@ -215,6 +215,29 @@ def make_data(source: Path):
             "buySource": buy_source,
         })
 
+    # Rebuild exact per-item recipe quantities from the uploaded workbook.
+    # This keeps the bulk planner in sync whenever source/prices.xlsx changes.
+    known_materials = {m["name"].casefold(): m for m in materials}
+    recipes = []
+    for item in items:
+        item_id = item["id"].removeprefix("item:")
+        components = []
+        for material, qty in ingredients.get(item_id, []):
+            target = known_materials.get(material.casefold())
+            components.append({
+                "id": target["id"] if target else f"material:{material.casefold()}",
+                "name": target["displayName"] if "displayName" in target else material,
+                "qty": qty,
+                "known": target is not None,
+            })
+        recipes.append({
+            "itemId": item["id"],
+            "itemName": item["name"],
+            "bench": item["group"],
+            "ingredients": components,
+            "complete": bool(components) and all(c["known"] for c in components),
+        })
+
     # Pawn Shop transaction price overrides are explicit and separate from
     # the public catalogue price (they apply in the sales calculator only).
     for record in items + materials:
@@ -239,6 +262,7 @@ def make_data(source: Path):
         },
         "items": items,
         "materials": materials,
+        "recipes": recipes,
     }
 
 
