@@ -6,6 +6,7 @@ let remoteReady=false;
 let remoteInventory=new Map();
 let remoteOrders=[];
 let loadingOperations=false;
+let postingMaterialSnapshot=false;
 let inventorySearch="";
 let inventoryFilter="All";
 const remoteBase=String(window.ICY_ROSE_CONFIG?.receiptEndpoint||"").trim().replace(/\/receipt\/?$/,'');
@@ -81,7 +82,7 @@ function renderInventory(){
        <div id="craft-preview" class="inline-note"></div><button type="submit" class="btn btn-ice">＋ Add finished stock & use materials</button>
       </form></div></section>
     </div>
-    <section class="card" style="margin-top:20px"><div class="card-header"><div><h2 class="card-title">Live stock list</h2><p class="card-subtitle">Shared with other staff using this site.</p></div><button id="stock-refresh" class="btn btn-ice">↻ Refresh</button></div>
+    <section class="card" style="margin-top:20px"><div class="card-header"><div><h2 class="card-title">Live stock list</h2><p class="card-subtitle">Shared with other staff using this site.</p></div><div class="stock-header-actions"><button id="post-materials" type="button" class="btn btn-primary" title="Send current material stock to the same Discord channel">↗ Post Materials to Discord</button><button id="stock-refresh" type="button" class="btn btn-ice">↻ Refresh</button></div></div>
       <div class="card-body"><div class="price-search-row"><input id="inventory-search" class="input" type="search" placeholder="Find an item or material…" value="${esc(inventorySearch)}" />
         <select id="inventory-filter" class="input narrow-select"><option>All</option><option>In stock</option><option>Needs restocking</option></select></div>
         <div class="table-scroll"><table class="data-table"><thead><tr><th>Product / material</th><th>Type</th><th>In stock</th><th>Bulk reserved</th><th>Available</th></tr></thead><tbody id="inventory-table"></tbody></table></div></div>
@@ -122,6 +123,21 @@ function renderInventory(){
   document.getElementById('inventory-search').addEventListener('input',e=>{inventorySearch=e.target.value;drawInventory();});
   document.getElementById('inventory-filter').value=inventoryFilter;
   document.getElementById('inventory-filter').addEventListener('change',e=>{inventoryFilter=e.target.value;drawInventory();});
+  document.getElementById('post-materials').addEventListener('click',async e=>{
+    if(postingMaterialSnapshot)return;
+    const materials=catalogue.filter(p=>p.type==='material').map(p=>({id:p.id,name:p.displayName}));
+    if(!materials.length){notify('No materials found in your Excel list.');return;}
+    if(!confirm(`Post your CURRENT material inventory (${materials.length} materials) to Discord? The live quantities will be read from Cloudflare, and no stock will change.`))return;
+    const button=e.currentTarget;
+    postingMaterialSnapshot=true;
+    button.disabled=true;
+    button.textContent='Posting current stock…';
+    try{
+      const result=await cloud('/inventory/post-materials','POST',{materials});
+      notify(result.discordPosted?`Material stock posted to Discord (${result.materialCount} materials).`:'Discord did not confirm the message. Please check your channel.');
+    }catch(err){notify(`Could not post material stock: ${err.message}`);}
+    finally{postingMaterialSnapshot=false;button.disabled=false;button.textContent='↗ Post Materials to Discord';}
+  });
   document.getElementById('stock-refresh').addEventListener('click',async()=>{try{await syncAndShow('inventory');notify('Latest stock loaded.');}catch(err){notify(err.message);}});
   drawInventory();
 }
