@@ -9,6 +9,8 @@ let loadingOperations=false;
 let postingMaterialSnapshot=false;
 let inventorySearch="";
 let inventoryFilter="All";
+let inventoryGroup="All";
+const inventoryAvailabilitySaving=new Set();
 const remoteBase=String(window.ICY_ROSE_CONFIG?.receiptEndpoint||"").trim().replace(/\/receipt\/?$/,'');
 function esc(s){return String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));}
 function stockOf(id){return remoteInventory.get(id)??0;}
@@ -82,10 +84,11 @@ function renderInventory(){
        <div id="craft-preview" class="inline-note"></div><button type="submit" class="btn btn-ice">＋ Add finished stock & use materials</button>
       </form></div></section>
     </div>
-    <section class="card" style="margin-top:20px"><div class="card-header"><div><h2 class="card-title">Live stock list</h2><p class="card-subtitle">Shared with other staff using this site.</p></div><div class="stock-header-actions"><button id="post-materials" type="button" class="btn btn-primary" title="Send current material stock to the same Discord channel">↗ Post Materials to Discord</button><button id="stock-refresh" type="button" class="btn btn-ice">↻ Refresh</button></div></div>
-      <div class="card-body"><div class="price-search-row"><input id="inventory-search" class="input" type="search" placeholder="Find an item or material…" value="${esc(inventorySearch)}" />
-        <select id="inventory-filter" class="input narrow-select"><option>All</option><option>In stock</option><option>Needs restocking</option></select></div>
-        <div class="table-scroll"><table class="data-table"><thead><tr><th>Product / material</th><th>Type</th><th>In stock</th><th>Bulk reserved</th><th>Available</th></tr></thead><tbody id="inventory-table"></tbody></table></div></div>
+    <section class="card" style="margin-top:20px"><div class="card-header"><div><h2 class="card-title">Live stock list</h2><p class="card-subtitle">Shared stock. Use the Buy / Sell switches to instantly enable or disable trading an item (without changing stock).</p></div><div class="stock-header-actions"><button id="post-materials" type="button" class="btn btn-primary" title="Send current material stock to the same Discord channel">↗ Post Materials to Discord</button><button id="stock-refresh" type="button" class="btn btn-ice">↻ Refresh</button></div></div>
+      <div class="card-body"><div class="price-search-row"><input id="inventory-search" class="input" type="search" aria-label="Search inventory" placeholder="Find an item or material…" value="${esc(inventorySearch)}" />
+        <select id="inventory-category" class="input narrow-select" aria-label="Inventory category"><option value="All">All categories</option></select>
+        <select id="inventory-filter" class="input narrow-select" aria-label="Stock status"><option>All</option><option>In stock</option><option>Needs restocking</option></select></div>
+        <div class="table-scroll"><table class="data-table"><thead><tr><th>Product / material</th><th>Type</th><th>In stock</th><th>Bulk reserved</th><th>Available</th><th>Can Sell</th><th>Can Buy</th></tr></thead><tbody id="inventory-table"></tbody></table></div></div>
     </section>`;
   const productInput=document.getElementById('stock-product');const datalist=document.getElementById('inventory-products');
   catalogue.forEach(p=>{const op=node('option');op.value=`${p.displayName} · ${p.group}`;datalist.append(op);});
@@ -121,6 +124,16 @@ function renderInventory(){
     catch(err){notify(err.message);b.disabled=false;}
   });
   document.getElementById('inventory-search').addEventListener('input',e=>{inventorySearch=e.target.value;drawInventory();});
+  const categorySelect=document.getElementById('inventory-category');
+  const groups=[...new Set(catalogue.map(p=>p.group))].sort((a,b)=>a.localeCompare(b));
+  groups.forEach(group=>{
+    const count=catalogue.filter(p=>p.group===group).length;
+    const option=node('option',null,`${group} (${count})`);option.value=group;
+    categorySelect.append(option);
+  });
+  if(inventoryGroup!=='All'&&!groups.includes(inventoryGroup))inventoryGroup='All';
+  categorySelect.value=inventoryGroup;
+  categorySelect.addEventListener('change',e=>{inventoryGroup=e.target.value;drawInventory();});
   document.getElementById('inventory-filter').value=inventoryFilter;
   document.getElementById('inventory-filter').addEventListener('change',e=>{inventoryFilter=e.target.value;drawInventory();});
   document.getElementById('post-materials').addEventListener('click',async e=>{
@@ -144,6 +157,7 @@ function renderInventory(){
 function drawInventory(){
   const target=document.getElementById('inventory-table');if(!target)return;
   const q=inventorySearch.toLowerCase().trim();const rows=catalogue.filter(p=>
+    (inventoryGroup==='All'||p.group===inventoryGroup)&&
     (!q||`${p.displayName} ${p.group}`.toLowerCase().includes(q))&&
     (inventoryFilter==='All'||(inventoryFilter==='In stock'&&stockOf(p.id)>0)||(inventoryFilter==='Needs restocking'&&stockOf(p.id)<=0)));
   target.replaceChildren();
@@ -153,9 +167,50 @@ function drawInventory(){
     tr.append(node('td',stockOf(p.id)<0?'negative-stock':'money money-ice',String(stockOf(p.id))));
     tr.append(node('td','money',String(reservedStock(p.id))));
     tr.append(node('td','money money-ice',String(availableStock(p.id))));
+    for(const [flag,label] of [['canSell','Sell'],['canBuy','Buy']]){
+      const td=node('td','availability-cell');
+      const enabled=p[flag]!==false;
+      const button=node('button',`availability-toggle ${enabled?'is-on':'is-off'}`,enabled?'On':'Off');
+      button.type='button';button.setAttribute('aria-pressed',String(enabled));
+      button.setAttribute('aria-label',`${label} ${p.displayName}: ${enabled?'on':'off'}. Click to ${enabled?'disable':'enable'}.`);
+      button.title=`${label}: ${enabled?'Enabled':'Disabled'} — click to ${enabled?'disable':'enable'}`;
+      button.disabled=inventoryAvailabilitySaving.has(p.id);
+      button.addEventListener('click',()=>setInventoryAvailability(p.id,flag,!enabled));
+      td.append(button);tr.append(td);
+    }
     target.append(tr);
   }
-  if(!rows.length){const tr=node('tr'),td=node('td','empty-state','No matching stock records.');td.colSpan=5;tr.append(td);target.append(tr);}
+  if(!rows.length){const tr=node('tr'),td=node('td','empty-state','No matching stock records.');td.colSpan=7;tr.append(td);target.append(tr);}
+}
+// Uses the SAME authenticated catalogue edit endpoint as Manage Items.
+// Version checking prevents a quick toggle from overwriting another staff edit.
+async function setInventoryAvailability(id,flag,enabled){
+  if(!['canBuy','canSell'].includes(flag)||inventoryAvailabilitySaving.has(id))return;
+  const product=lookup.get(id);
+  if(!product||!staffPin){notify('Unlock Inventory before editing availability.');return;}
+  const saved=data.catalogueEdits?.find(x=>x.id===id);
+  const edit=saved?.edit?structuredClone(saved.edit):baseEdit(product);
+  if(!edit){notify('Could not load that product. Refresh and try again.');return;}
+  edit.canSell=edit.canSell!==false;edit.canBuy=edit.canBuy!==false;
+  edit[flag]=enabled;
+  inventoryAvailabilitySaving.add(id);drawInventory();
+  try{
+    await cloud('/catalogue/edit','POST',{
+      edit,isNew:!!saved?.isNew,expectedVersion:saved?.version||0,
+      base:baseEdit(product)||edit
+    });
+    // Update all price lists and carts, but keep Inventory's stock-edit form intact.
+    await refreshCatalogue(false);
+    notify(`${product.displayName}: ${flag==='canSell'?'selling':'buying'} ${enabled?'enabled':'disabled'}.`);
+  }catch(err){
+    if(/changed in another tab|refresh/i.test(err.message)){
+      try{await refreshCatalogue(false);}catch{}
+    }
+    notify(`Could not save availability: ${err.message}`);
+  }finally{
+    inventoryAvailabilitySaving.delete(id);
+    if(currentView==='inventory')drawInventory();
+  }
 }
 function bulkPlan(){
   const lines=state.bulkDraft.map(x=>({item:lookup.get(x.id),qty:Number(x.qty)||0,override:x.override})).filter(x=>x.item&&x.item.type==='item'&&x.item.canSell!==false&&x.qty>0);

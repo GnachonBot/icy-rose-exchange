@@ -4,6 +4,7 @@ let adminHistory=[];
 let adminSelection='';
 let adminDraft=null;
 let adminSearch='';
+let adminCategory='All';
 let adminWorking=false;
 const adminDraftNew=()=>({id:'item:USER-'+crypto.randomUUID().slice(0,12),type:'item',name:'',group:'Normal Bench',archived:false,
   itemSellOverride:null,itemBuyFixed:null,itemBuyPercent:null,shopSellOverride:null,canSell:true,canBuy:true,ingredients:[]});
@@ -42,6 +43,55 @@ function adminPreview(edit){
   const buy=edit.itemBuyFixed??(sell===null?null:sell*(edit.itemBuyPercent??data.defaultBuyPercent??0.5));
   return `Crafting cost: ${currency(cost)} · Sell: ${currency(sell)} · Buy: ${currency(buy)}`;
 }
+// Keep the picker DOM mounted while searching. Rebuilding the entire page on
+// each keystroke resets the browser's caret / IME composition state.
+function adminCategories(){
+  const counts=new Map();
+  for(const product of catalogue)counts.set(product.group,(counts.get(product.group)||0)+1);
+  const preferred=['Normal Bench','Heist Bench','Recycle Center','Materials'];
+  return [...counts.keys()].sort((a,b)=>{
+    const ai=preferred.indexOf(a),bi=preferred.indexOf(b);
+    return (ai<0?preferred.length:ai)-(bi<0?preferred.length:bi)||a.localeCompare(b);
+  }).map(group=>({group,count:counts.get(group)}));
+}
+function adminPickerProducts(){
+  const query=adminSearch.trim().toLocaleLowerCase();
+  return catalogue.filter(p=>(adminCategory==='All'||p.group===adminCategory)&&
+    (!query||`${p.displayName} ${p.name} ${p.group}`.toLocaleLowerCase().includes(query)))
+    .sort((a,b)=>a.displayName.localeCompare(b.displayName));
+}
+function drawAdminPicker(){
+  const select=document.getElementById('admin-select');
+  if(!select)return;
+  const products=adminPickerProducts();
+  select.replaceChildren();
+  // Avoid showing an unselected first item as though it were already being edited.
+  const placeholder=document.createElement('option');
+  placeholder.value='';placeholder.textContent='Select an item to edit…';
+  placeholder.disabled=true;
+  if(!products.some(p=>p.id===adminSelection))placeholder.selected=true;
+  select.append(placeholder);
+  const groups=adminCategory==='All'?adminCategories().map(x=>x.group):[adminCategory];
+  for(const group of groups){
+    const members=products.filter(p=>p.group===group);
+    if(!members.length)continue;
+    const list=document.createElement('optgroup');list.label=`${group} (${members.length})`;
+    for(const product of members){
+      const option=document.createElement('option');
+      option.value=product.id;option.textContent=product.displayName;
+      if(product.id===adminSelection)option.selected=true;
+      list.append(option);
+    }
+    select.append(list);
+  }
+  if(!products.length){
+    const option=document.createElement('option');option.disabled=true;
+    option.textContent='No items match this filter';select.append(option);
+  }
+  const count=document.getElementById('admin-picker-count');
+  if(count)count.textContent=`Showing ${products.length} of ${catalogue.length} items`;
+  // Do not replace or refocus #admin-search. The cursor stays where staff put it.
+}
 function renderAdmin(){
   if(!staffPin){
     APP.innerHTML=heading(VIEWS.admin)+`<section class="card unlock-card"><div class="card-body"><div class="eyebrow">STAFF ONLY</div><h2>Unlock Price &amp; Item Manager</h2><p class="card-subtitle">Use the same staff passphrase as Inventory and Discord receipts. We won't save it on this device.</p><form id="admin-unlock" class="unlock-row"><input id="admin-pin" class="input" type="password" autocomplete="off" required placeholder="Staff passphrase"/><button class="btn btn-primary">Unlock editor</button></form><p class="hint">Editing requires the catalogue D1 migration and updated Cloudflare Worker.</p></div></section>`;
@@ -53,25 +103,40 @@ function renderAdmin(){
     return;
   }
   const chosen=adminItem();
-  const options=catalogue.filter(x=>`${x.displayName} ${x.group}`.toLowerCase().includes(adminSearch.toLowerCase()))
-    .sort((a,b)=>a.displayName.localeCompare(b.displayName));
+  const categories=adminCategories();
+  if(adminCategory!=='All'&&!categories.some(x=>x.group===adminCategory))adminCategory='All';
   APP.innerHTML=heading(VIEWS.admin)+`<div class="metrics">
     ${metric('Active finished items',data.items.length,'Prices linked to recipes')}
     ${metric('Active materials',data.materials.length,'Separate buy/sell prices')}
     ${metric('Recent changes',adminHistory.length,'Saved in Cloudflare D1')}
   </div>
   <div class="admin-layout"><section class="card"><div class="card-header"><div><h2 class="card-title">Catalogue</h2><p class="card-subtitle">Choose an item or add a new one.</p></div></div><div class="card-body admin-picker">
-    <input class="input" type="search" id="admin-search" placeholder="Find an item or material…" value="${esc(adminSearch)}"/>
-    <select id="admin-select" class="input" size="11" aria-label="Catalogue products">${options.map(x=>`<option value="${esc(x.id)}" ${chosen?.id===x.id?'selected':''}>${esc(x.displayName)} · ${esc(x.group)}</option>`).join('')}</select>
+    <div><label class="form-label" for="admin-category">Category</label>
+      <select id="admin-category" class="input"><option value="All">All categories (${catalogue.length})</option>${categories.map(x=>`<option value="${esc(x.group)}" ${x.group===adminCategory?'selected':''}>${esc(x.group)} (${x.count})</option>`).join('')}</select></div>
+    <div><label class="form-label" for="admin-search">Search within category</label>
+      <input class="input" type="search" id="admin-search" placeholder="Find an item or material…" autocomplete="off" value="${esc(adminSearch)}"/></div>
+    <div class="admin-picker-topline"><span id="admin-picker-count" aria-live="polite"></span><span>Choose to edit</span></div>
+    <select id="admin-select" class="input" size="7" aria-label="Catalogue products"></select>
     <div class="admin-picker-actions"><button id="admin-new-item" class="btn btn-ice" type="button">+ Finished item</button><button id="admin-new-mat" class="btn btn-ice" type="button">+ Material</button></div>
     <button id="admin-refresh" class="btn btn-outline" type="button">↻ Refresh prices</button>
   </div></section>
   <section class="card"><div class="card-header"><div><h2 class="card-title">${chosen?'Edit product':'Choose a product'}</h2><p class="card-subtitle">Choose Can Sell and/or Can Buy independently, then save.</p></div>${chosen?`<span class="tag">${chosen.type==='item'?'Finished item':'Material'}</span>`:''}</div>
     <div class="card-body">${chosen?adminForm(chosen):'<div class="empty-state">Select an item on the left, or create a new one.</div>'}</div>
   </section></div>
-  <section class="card" style="margin-top:20px"><div class="card-header"><div><h2 class="card-title">Change history</h2><p class="card-subtitle">Every edit is recorded, with a restore button for earlier versions.</p></div><button type="button" class="btn btn-ice" id="admin-history-refresh">Refresh</button></div><div class="card-body" id="admin-history-body"></div></section>`;
-  document.getElementById('admin-search').oninput=e=>{adminSearch=e.target.value;renderAdmin();document.getElementById('admin-search')?.focus();};
-  document.getElementById('admin-select').onchange=e=>{adminSelection=e.target.value;adminDraft=null;renderAdmin();};
+  <details class="card admin-history-panel" style="margin-top:20px"><summary class="card-header"><div><h2 class="card-title">Change history</h2><p class="card-subtitle">Previous edits and restore options — open when needed.</p></div><span class="admin-history-chevron" aria-hidden="true">⌄</span></summary><div class="card-body"><button type="button" class="btn btn-ice" id="admin-history-refresh">↻ Refresh history</button><div id="admin-history-body"></div></div></details>`;
+  document.getElementById('admin-search').addEventListener('input',e=>{
+    adminSearch=e.target.value;
+    drawAdminPicker();
+  });
+  document.getElementById('admin-category').addEventListener('change',e=>{
+    adminCategory=e.target.value;
+    drawAdminPicker();
+  });
+  document.getElementById('admin-select').addEventListener('change',e=>{
+    if(!lookup.has(e.target.value))return;
+    adminSelection=e.target.value;adminDraft=null;renderAdmin();
+  });
+  drawAdminPicker();
   document.getElementById('admin-new-item').onclick=()=>{adminSelection='';adminDraft=adminDraftNew();renderAdmin();};
   document.getElementById('admin-new-mat').onclick=()=>{adminSelection='';adminDraft={id:'material:user-'+crypto.randomUUID().slice(0,12),type:'material',name:'',group:'Materials',archived:false,materialCost:0,materialSell:null,materialBuy:null,shopSellOverride:null,canSell:true,canBuy:true};renderAdmin();};
   document.getElementById('admin-refresh').onclick=()=>adminRefresh();

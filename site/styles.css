@@ -228,3 +228,31 @@ main{width:100%;max-width:1400px;margin:0 auto;padding:34px clamp(20px,4vw,56px)
 .admin-offer-switch small{color:#a9c0ce;font-size:12px;line-height:1.4;}
 .small-action:disabled{cursor:not-allowed;opacity:.25;filter:grayscale(1);}
 @media(max-width:720px){.admin-offers{grid-template-columns:1fr;}}
+
+/* Manage Items usability: compact, category-sorted picker with stable search caret. */
+.admin-picker{gap:10px}
+.admin-picker select[size]{height:242px;min-height:242px}
+.admin-picker select optgroup{color:#83d7e8;font-weight:800;font-style:normal;padding:6px 0}
+.admin-picker select option{font-weight:500;color:#eef7fa;background:#121f2d;line-height:1.5}
+.admin-picker-topline{display:flex;align-items:center;justify-content:space-between;gap:12px;font-size:11px;color:#adc0ce}
+.admin-picker-topline #admin-picker-count{font-weight:750;color:#e5f4fa}
+.admin-picker .form-label{margin-bottom:6px}
+
+/* Inventory: one-click live buy/sell availability controls, separate from stock. */
+.availability-cell{white-space:nowrap;text-align:center;min-width:74px}
+.availability-toggle{border:1px solid #476272;border-radius:999px;min-width:57px;min-height:33px;padding:5px 12px;font:inherit;font-size:12px;font-weight:850;cursor:pointer;transition:background .15s ease,border-color .15s ease}
+.availability-toggle.is-on{color:#bdf3f7;background:#133a45;border-color:#408b9c}
+.availability-toggle.is-off{color:#ffc3ce;background:#44202b;border-color:#a04559}
+.availability-toggle:focus-visible{outline:3px solid #f2f7fa;outline-offset:3px}
+.availability-toggle:hover:not(:disabled){filter:brightness(1.2)}
+.availability-toggle:disabled{opacity:.5;cursor:progress}
+@media(max-width:630px){.admin-picker select[size]{height:218px;min-height:218px}.availability-cell{min-width:68px}.availability-toggle{min-width:53px}}
+.admin-history-panel>summary{cursor:pointer;list-style:none}
+.admin-history-panel>summary::-webkit-details-marker{display:none}
+.admin-history-panel>summary:focus-visible{outline:2px solid #6ee8ec;outline-offset:3px}
+.admin-history-panel .admin-history-chevron{font-size:24px;color:#a8dbe8;transition:transform .15s ease}
+.admin-history-panel[open] .admin-history-chevron{transform:rotate(180deg)}
+.admin-history-panel #admin-history-body{margin-top:12px}
+@media(max-width:630px){
+  #inventory-search,#inventory-category,#inventory-filter{width:100%;max-width:none;margin-bottom:10px}
+}
