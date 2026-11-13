@@ -31,6 +31,14 @@ R = "http://schemas.openxmlformats.org/officeDocument/2006/relationships"
 P = "http://schemas.openxmlformats.org/package/2006/relationships"
 
 
+def availability(value):
+    # Empty cells in older workbooks retain the original behaviour (both enabled).
+    if value is None or str(value).strip() == '':
+        return True
+    if isinstance(value, bool):
+        return value
+    return str(value).strip().lower() not in ('no', 'false', '0', 'off', 'disabled')
+
 def load_workbook(path: Path) -> dict[str, dict[str, str | float | bool]]:
     """Read displayed literal/cached Excel values by cell without external deps."""
     with zipfile.ZipFile(path) as z:
@@ -120,7 +128,7 @@ def make_data(source: Path):
     material_costs = {}
     for r in range(7, 1000):
         name = tidy(materials_ws.get(f"A{r}"))
-        if not name:
+        if not name or tidy(materials_ws.get(f"K{r}")).upper() == "ARCHIVED":
             continue
         base_sell = number(materials_ws.get(f"C{r}"))
         own_sell = number(materials_ws.get(f"J{r}"))
@@ -128,11 +136,16 @@ def make_data(source: Path):
         buy = number(materials_ws.get(f"F{r}"))
         material_costs[name.casefold()] = base_sell
         materials.append({
-            "id": f"material:{name.casefold()}",
+            "id": tidy(materials_ws.get(f"L{r}")) or f"material:{name.casefold()}",
             "name": name,
             "group": "Materials",
             "type": "material",
+            "canSell": availability(materials_ws.get(f"M{r}")),
+            "canBuy": availability(materials_ws.get(f"N{r}")),
             "craftCost": None,
+            "materialCost": normalize_price(base_sell),
+            "customSellPrice": normalize_price(own_sell),
+            "shopSellOverride": None,
             "sellPrice": normalize_price(sell),
             "buyPrice": normalize_price(buy),
             "priceSource": "custom" if own_sell is not None else "material",
@@ -173,7 +186,7 @@ def make_data(source: Path):
     items = []
     for r in range(7, 1000):
         name = tidy(items_ws.get(f"C{r}"))
-        if not name:
+        if not name or tidy(items_ws.get(f"P{r}")).upper() == "ARCHIVED":
             continue
         item_id = tidy(items_ws.get(f"A{r}")) or f"item-row-{r}"
         bench = tidy(items_ws.get(f"B{r}")) or "Other Bench"
@@ -208,9 +221,15 @@ def make_data(source: Path):
             "name": name,
             "group": bench,
             "type": "item",
+            "canSell": availability(items_ws.get(f"Q{r}")),
+            "canBuy": availability(items_ws.get(f"R{r}")),
             "craftCost": normalize_price(cost),
             "sellPrice": normalize_price(final_sell),
             "buyPrice": normalize_price(buy_price),
+            "customSellPrice": normalize_price(own_price),
+            "buyFixed": normalize_price(custom_buy),
+            "buyPercent": normalize_price(custom_pct),
+            "shopSellOverride": None,
             "priceSource": "custom" if own_price is not None else "2x craft cost",
             "buySource": buy_source,
         })
@@ -243,6 +262,7 @@ def make_data(source: Path):
     for record in items + materials:
         name = record["name"].casefold()
         record["shopPrice"] = normalize_price(shop_override.get(name, record["sellPrice"]))
+        record["shopSellOverride"] = normalize_price(shop_override.get(name))
         record["hasShopOverride"] = name in shop_override
 
     # Intentional displayed name changes are controlled here: the workbook

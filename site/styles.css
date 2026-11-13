@@ -195,3 +195,36 @@ main{width:100%;max-width:1400px;margin:0 auto;padding:34px clamp(20px,4vw,56px)
 .stock-header-actions .btn{white-space:nowrap}
 .btn:disabled{opacity:.57;cursor:not-allowed;filter:grayscale(.14)}
 @media(max-width:630px){.stock-header-actions{width:100%;justify-content:stretch}.stock-header-actions .btn{flex:1;white-space:normal}}
+/* Staff catalogue editor — readable dark panels on desktop and mobile. */
+.admin-layout{display:grid;grid-template-columns:minmax(265px,.72fr) minmax(0,1.28fr);gap:20px;align-items:start}
+.admin-picker{display:grid;gap:12px}
+.admin-picker select[size]{min-height:330px;height:330px;padding:5px 7px;overflow:auto}
+.admin-picker select option{padding:9px 8px;border-radius:5px;white-space:normal}
+.admin-picker select option:checked{color:#fff;background:#24495f}
+.admin-picker-actions{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.admin-picker-actions .btn{white-space:normal;padding:10px 6px}
+.admin-help{border-left:3px solid #4bbbd4;background:#102434;padding:11px 13px;color:#bed5e2;font-size:13px;line-height:1.5}
+.admin-recipe-title{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.admin-recipe-title h3{margin:0;font-size:16px}
+.admin-ingredient-line{display:grid;grid-template-columns:1fr 95px 47px;gap:8px;margin-top:7px}
+.admin-ingredient-line .btn{min-width:0;padding:4px}
+.admin-archive{display:flex;align-items:center;gap:9px;color:#f1bdc8;font-size:13px}
+.admin-archive input{width:18px;height:18px;accent-color:#ed3e66}
+.admin-preview{border:1px solid #2b4e5b;border-radius:9px;background:#0f2630;color:#b4e7eb;padding:12px 14px;font-size:13px;line-height:1.5}
+.admin-history-entry{display:flex;justify-content:space-between;align-items:center;gap:12px;border-bottom:1px solid #2b3b48;padding:11px 0}
+.admin-history-entry strong,.admin-history-entry small{display:block;line-height:1.5}
+.admin-history-entry small{color:#a9b7c6;font-size:11px}
+.admin-history-entry .btn{flex-shrink:0}
+@media(max-width:1050px){.admin-layout{grid-template-columns:1fr}}
+@media(max-width:630px){.admin-picker-actions{grid-template-columns:1fr 1fr}.admin-history-entry{align-items:flex-start;flex-direction:column}.admin-ingredient-line{grid-template-columns:minmax(0,1fr) 74px 43px}}
+
+/* Independent sales and purchasing availability switches (Price & Item Manager). */
+.admin-offers{display:grid;grid-template-columns:1fr 1fr;gap:12px;border:1px solid rgba(119,149,169,.38);border-radius:14px;padding:18px;margin:16px 0;background:#0c1723;}
+.admin-offers legend{font-weight:700;color:#dbeefa;padding:0 8px;font-size:14px;}
+.admin-offer-switch{display:flex;align-items:flex-start;gap:10px;border:1px solid #30465a;border-radius:10px;padding:13px 12px;cursor:pointer;background:#142334;}
+.admin-offer-switch input{accent-color:#4fdaec;width:19px;height:19px;margin:2px 0;flex-shrink:0;}
+.admin-offer-switch span{display:flex;flex-direction:column;gap:3px;}
+.admin-offer-switch strong{color:#f5fafb;font-size:15px;}
+.admin-offer-switch small{color:#a9c0ce;font-size:12px;line-height:1.4;}
+.small-action:disabled{cursor:not-allowed;opacity:.25;filter:grayscale(1);}
+@media(max-width:720px){.admin-offers{grid-template-columns:1fr;}}

@@ -6,10 +6,13 @@ const VIEWS = {
   bulk: { title: "Bulk Orders", eyebrow: "SHOP / ORDERS & CRAFTING", subtitle: "Plan customer orders, calculate exact materials, and notify Discord when an order is placed.", chip: "Live crafting requirements" },
   inventory: { title: "Inventory", eyebrow: "SHOP / SHARED STOCK", subtitle: "Count finished goods and materials. Sales deduct stock, purchases add stock, and crafting uses materials.", chip: "Shared through Cloudflare" },
   cash: { title: "Cash Calculator", eyebrow: "SHOP / CASH COUNTER", subtitle: "Count Stacks and Rolls together, even when each one has a different value.", chip: "Two cash types" },
-  prices: { title: "Items & Prices", eyebrow: "SHOP / LIVE PRICE LIST", subtitle: "Browse every item and material from the latest Excel workbook, with separate selling and buying prices.", chip: "Linked to your workbook" }
+  prices: { title: "Items & Prices", eyebrow: "SHOP / LIVE PRICE LIST", subtitle: "Browse every item and material, including live updates saved by staff.", chip: "Cloudflare + Excel" },
+  admin: { title: "Manage Items", eyebrow: "SHOP / STAFF ADMIN", subtitle: "Update buying and selling prices, add products, edit recipes and track changes.", chip: "Staff only" }
 };
 
 let data = null;
+let workbookData = null;
+let lastCatalogueFetch = 0;
 let catalogue = [];
 let lookup = new Map();
 let currentView = "pawn";
@@ -61,6 +64,7 @@ function notify(msg) {
   clearTimeout(toastTimer); t.textContent=msg; t.classList.add("visible");
   toastTimer=setTimeout(()=>t.classList.remove("visible"),3200);
 }
+function canTransact(product,mode){return !!product && (mode==='pawn'?product.canSell!==false:product.canBuy!==false);}
 function priceFor(product, mode) {
   return mode === "pawn" ? product.shopPrice : product.buyPrice;
 }
@@ -68,7 +72,7 @@ function cartFor(mode) { return mode === "pawn" ? state.pawnCart : state.buyingC
 function resetPendingReceipt(mode) { delete state.pendingReceiptIds[mode]; }
 function getLine(mode, entry) {
   const item=lookup.get(entry.id);
-  if (!item) return null;
+  if (!item || !canTransact(item,mode)) return null;
   const qty = Number(entry.qty) || 0;
   const base=priceFor(item,mode);
   const unit=entry.override !== null && entry.override !== undefined && entry.override !== "" ? Number(entry.override) : base;
@@ -96,13 +100,14 @@ function setView(name) {
   else if(name==="bulk") renderBulk();
   else if(name==="inventory") renderInventory();
   else if(name==="cash") renderCash();
+  else if(name==="admin") renderAdmin();
   else renderPrices();
 }
 
 function appendSearchOptions(input) {
   const datalist=node("datalist");
   datalist.id="product-options";
-  catalogue.forEach(p=>{
+  catalogue.filter(p=>canTransact(p,currentView)).forEach(p=>{
     const option=node("option");
     option.value=`${p.displayName} · ${p.group}`;
     datalist.appendChild(option);
@@ -119,7 +124,8 @@ function findProduct(raw) {
 }
 function addItem(mode,id,qty=1) {
   const product=lookup.get(id);
-  if(!product) return;
+  if(!product)return;
+  if(!canTransact(product,mode)){notify(`${product.displayName} is not available for ${mode==='pawn'?'selling':'buying'}.`);return;}
   const cart=cartFor(mode);
   const prior=cart.find(x=>x.id===id);
   if(prior) prior.qty=Math.min(MAX_RECEIPT_QTY,prior.qty+qty);
@@ -158,6 +164,7 @@ function renderCart(mode) {
     e.preventDefault();
     const product=findProduct(addInput.value);
     if(!product) { notify("Choose a valid item from the suggestions."); addInput.focus(); return; }
+    if(!canTransact(product,mode)){notify(`This item is not available for ${mode==='pawn'?'selling':'buying'}.`);return;}
     const qty=Math.floor(Number(document.getElementById("product-qty").value));
     if(!Number.isFinite(qty)||qty<1||qty>MAX_RECEIPT_QTY) {notify("Enter a quantity of at least 1.");return;}
     addItem(mode,product.id,qty);
@@ -207,6 +214,7 @@ async function completeOrder(mode) {
   if (orderPosting) return;
   const summary = cartMetrics(mode);
   if (!summary.lines.length) { notify("Add items before completing an order."); return; }
+  if(summary.lines.some(l=>!canTransact(l.item,mode))){notify('A product is no longer available for this transaction. Refresh the cart.');return;}
   if (summary.lines.length > RECEIPT_LIMIT) { notify(`Receipts support up to ${RECEIPT_LIMIT} different items. Split the order.`); return; }
   if (summary.lines.some(l => !Number.isInteger(l.qty) || l.qty < 1 || l.qty > MAX_RECEIPT_QTY || !Number.isFinite(l.unit) || l.unit < 0 || l.unit > MAX_RECEIPT_PRICE)) {
     notify("Set a valid quantity and price for every item before completing."); return;
@@ -314,30 +322,54 @@ function drawPriceTable() {
     const tr=node("tr");
     const item=node("td");item.append(node("span","product-name",p.displayName));if(p.displayName!==p.name)item.append(node("span","product-sub",`Workbook: ${p.name}`));tr.append(item);
     const group=node("td");group.append(node("span","badge-group "+(p.type==="material"?"material":p.group==="Heist Bench"?"heist":""),p.group));tr.append(group);
-    tr.append(node("td","money money-ice",currency(p.shopPrice)),node("td",p.buyPrice===null?"amount-warning":"money money-rose",currency(p.buyPrice)));
+    tr.append(node("td",p.canSell===false?'amount-warning':'money money-ice',p.canSell===false?'Not selling':currency(p.shopPrice)),node("td",p.canBuy===false?'amount-warning':p.buyPrice===null?'amount-warning':'money money-rose',p.canBuy===false?'Not buying':currency(p.buyPrice)));
     const buttons=node("td");const actions=node("div","table-actions");
-    const addSale=node("button","small-action","Sell +");addSale.type="button";addSale.addEventListener("click",()=>addItem("pawn",p.id));
-    const addBuy=node("button","small-action pink","Buy +");addBuy.type="button";addBuy.addEventListener("click",()=>addItem("buying",p.id));
+    const addSale=node("button","small-action","Sell +");addSale.type="button";addSale.disabled=p.canSell===false;addSale.title=addSale.disabled?'Not offered for sale':'';addSale.addEventListener("click",()=>addItem("pawn",p.id));
+    const addBuy=node("button","small-action pink","Buy +");addBuy.type="button";addBuy.disabled=p.canBuy===false;addBuy.title=addBuy.disabled?'Not accepting purchases':'';addBuy.addEventListener("click",()=>addItem("buying",p.id));
     actions.append(addSale,addBuy);buttons.append(actions);tr.append(buttons);target.append(tr);
   }
   if(!listed.length){const row=node("tr");const td=node("td","empty-state","No matching products found.");td.colSpan=5;row.append(td);target.append(row);}
   document.getElementById("price-result-count").textContent=`Showing ${listed.length} of ${catalogue.length} entries · Missing prices display as “Not set”`;
 }
 
+async function refreshCatalogue(render=false){
+  let edits=[];
+  if(remoteBase){
+    const response=await fetch(remoteBase+'/catalogue/changes',{cache:'no-store'});
+    if(response.ok){const result=await response.json();edits=result.edits||[];}
+    else if(response.status!==404)throw Error('Live catalogue could not be loaded. Please check Cloudflare.');
+  }
+  data=window.IcyCatalogue.apply(workbookData,edits);
+  lastCatalogueFetch = Date.now();
+  catalogue=[...data.items,...data.materials];
+  lookup=new Map(catalogue.map(x=>[x.id,x]));
+  state.pawnCart=state.pawnCart.filter(x=>canTransact(lookup.get(x.id),'pawn'));
+  state.buyingCart=state.buyingCart.filter(x=>canTransact(lookup.get(x.id),'buying'));
+  state.bulkDraft=state.bulkDraft.filter(x=>!!lookup.get(x.id) && lookup.get(x.id).canSell!==false);
+  persist();
+  if(render)setView(currentView);
+}
 async function init() {
   try {
     const res=await fetch("data/prices.json",{cache:"no-store"});
     if(!res.ok)throw new Error(`HTTP ${res.status}`);
-    data=await res.json();
+    workbookData=await res.json();
+    data=window.IcyCatalogue.apply(workbookData,[]);
     catalogue=[...data.items,...data.materials];
     lookup=new Map(catalogue.map(x=>[x.id,x]));
-    state.pawnCart=state.pawnCart.filter(x=>lookup.has(x.id));
-    state.buyingCart=state.buyingCart.filter(x=>lookup.has(x.id));
+    try{await refreshCatalogue();}catch(error){console.warn("Live pricing unavailable; showing Excel prices",error);notify("Live price updates temporarily unavailable — showing Excel prices.");}
+    state.pawnCart=state.pawnCart.filter(x=>canTransact(lookup.get(x.id),'pawn'));
+    state.buyingCart=state.buyingCart.filter(x=>canTransact(lookup.get(x.id),'buying'));
+    state.bulkDraft=state.bulkDraft.filter(x=>!!lookup.get(x.id) && lookup.get(x.id).canSell!==false);
     persist();
     const updated=new Date(data.generatedAt);
     document.getElementById("data-updated").textContent=`Data refreshed ${updated.toLocaleDateString("en-GB",{day:"numeric",month:"short",year:"numeric"})}`;
     document.querySelectorAll("[data-view]").forEach(button=>button.addEventListener("click",()=>setView(button.dataset.view)));
     setView(currentView);
+    // When another staff member edits prices, refresh on the next tab focus.
+    window.addEventListener('focus',()=>{
+      if(Date.now()-lastCatalogueFetch>30000)refreshCatalogue(true).catch(()=>{});
+    });
   } catch(err) {
     APP.replaceChildren(el(`<section class="card"><div class="card-body"><h1>Couldn't load the price data</h1><p class="hint">Start a local web server or deploy the project to GitHub Pages. File:// opening won't load the JSON file in some browsers.</p><p class="hint">Details: ${String(err.message||err).replace(/[<>]/g,"")}</p></div></section>`));
   }

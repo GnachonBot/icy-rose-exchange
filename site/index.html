@@ -9,7 +9,9 @@
     <link rel="icon" href="assets/favicon.svg" type="image/svg+xml" />
     <link rel="stylesheet" href="styles.css" />
     <script src="config.js" defer></script>
+    <script src="catalogue.js" defer></script>
     <script src="operations.js" defer></script>
+    <script src="admin.js" defer></script>
     <script src="app.js" defer></script>
   </head>
   <body>
@@ -26,10 +28,11 @@
           <button class="nav-item" data-view="inventory" type="button"><span class="nav-icon" aria-hidden="true">◫</span><span>Inventory</span><span class="nav-arrow">›</span></button>
           <button class="nav-item" data-view="cash" type="button"><span class="nav-icon" aria-hidden="true">＄</span><span>Cash Calculator</span><span class="nav-arrow">›</span></button>
           <button class="nav-item" data-view="prices" type="button"><span class="nav-icon" aria-hidden="true">≡</span><span>Items & Prices</span><span class="nav-arrow">›</span></button>
+          <button class="nav-item" data-view="admin" type="button"><span class="nav-icon" aria-hidden="true">⚙</span><span>Manage Items</span><span class="nav-arrow">›</span></button>
         </nav>
         <div class="sidebar-footer">
           <div class="source-pill"><span class="live-dot"></span> EXCEL-POWERED PRICES</div>
-          <p>Update the workbook on GitHub to refresh this site for everyone.</p>
+          <p>Edit prices in Manage Items, or upload a new workbook to GitHub.</p>
           <span id="data-updated">Loading prices…</span>
         </div>
       </aside>

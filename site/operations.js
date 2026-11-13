@@ -158,7 +158,7 @@ function drawInventory(){
   if(!rows.length){const tr=node('tr'),td=node('td','empty-state','No matching stock records.');td.colSpan=5;tr.append(td);target.append(tr);}
 }
 function bulkPlan(){
-  const lines=state.bulkDraft.map(x=>({item:lookup.get(x.id),qty:Number(x.qty)||0,override:x.override})).filter(x=>x.item&&x.qty>0);
+  const lines=state.bulkDraft.map(x=>({item:lookup.get(x.id),qty:Number(x.qty)||0,override:x.override})).filter(x=>x.item&&x.item.type==='item'&&x.item.canSell!==false&&x.qty>0);
   const mats=new Map(),items=[],missing=[];let total=0;
   for(const line of lines){
     const stock=availableStock(line.item.id);const toCraft=Math.max(0,line.qty-stock);
@@ -203,7 +203,7 @@ function renderBulk(){
       <div class="checkout-actions" style="margin-top:20px"><button class="btn btn-primary" id="place-bulk" ${!p.items.length||p.missing.length||p.items.some(x=>!Number.isFinite(x.unit))?'disabled':''}>📦 Place order & notify Discord</button><button class="btn btn-danger" id="clear-bulk">Clear draft</button></div></div></section>
     </div>
     <section class="card" style="margin-top:20px"><div class="card-header"><div><h2 class="card-title">Saved bulk orders</h2><p class="card-subtitle">Shared live with staff; mark fulfilled when collected.</p></div><button class="btn btn-ice" id="bulk-refresh">↻ Refresh</button></div><div class="card-body" id="bulk-history"></div></section>`;
-  const datalist=document.getElementById('bulk-choices');catalogue.filter(x=>x.type==='item').forEach(x=>{const o=node('option');o.value=`${x.displayName} · ${x.group}`;datalist.append(o);});
+  const datalist=document.getElementById('bulk-choices');catalogue.filter(x=>x.type==='item'&&x.canSell!==false).forEach(x=>{const o=node('option');o.value=`${x.displayName} · ${x.group}`;datalist.append(o);});
   const rows=document.getElementById('bulk-draft-table');
   p.items.forEach((x)=>{
     const tr=node('tr');tr.innerHTML=`<td><span class="product-name">${esc(x.item.displayName)}</span><span class="product-sub">${esc(x.item.group)}</span></td>
@@ -219,6 +219,7 @@ function renderBulk(){
   document.getElementById('bulk-add').addEventListener('submit',e=>{
     e.preventDefault();const product=findProduct(document.getElementById('bulk-product').value),qty=Number(document.getElementById('bulk-qty').value);
     if(!product||product.type!=='item'){notify('Choose a craftable finished item.');return;}
+    if(product.canSell===false){notify('This item is not currently available for sale or bulk orders.');return;}
     if(!Number.isInteger(qty)||qty<1||qty>10000){notify('Enter a valid quantity.');return;}
     const existing=state.bulkDraft.find(i=>i.id===product.id);
     if(existing)existing.qty=Math.min(10000,existing.qty+qty);else state.bulkDraft.push({id:product.id,qty});
