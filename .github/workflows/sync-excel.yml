@@ -1,0 +1,51 @@
+name: Sync admin prices back to Excel
+
+on:
+  schedule:
+    - cron: '*/15 * * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: icy-rose-excel-sync
+  cancel-in-progress: false
+
+jobs:
+  update-workbook:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          persist-credentials: true
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Download secured Cloudflare catalogue updates
+        env:
+          EXPORT_URL: ${{ secrets.ICY_ROSE_EXPORT_URL }}
+          EXPORT_TOKEN: ${{ secrets.ICY_ROSE_EXPORT_TOKEN }}
+        run: |
+          if [ -z "$EXPORT_URL" ] || [ -z "$EXPORT_TOKEN" ]; then
+            echo 'Add ICY_ROSE_EXPORT_URL and ICY_ROSE_EXPORT_TOKEN in repository Settings → Secrets and variables → Actions.' >&2
+            exit 1
+          fi
+          curl --fail --show-error --silent --retry 3 --max-time 30 \
+            --header "Authorization: Bearer ${EXPORT_TOKEN}" \
+            "$EXPORT_URL" -o /tmp/icy-rose-changes.json
+      - name: Apply edits to original Excel cells
+        run: |
+          python -m scripts.sync_excel source/prices.xlsx /tmp/icy-rose-changes.json
+          python scripts/build_data.py source/prices.xlsx site/data/prices.json
+      - name: Commit updated workbook and site data
+        run: |
+          git add source/prices.xlsx site/data/prices.json
+          if git diff --cached --quiet; then
+            echo 'No changes to commit'
+          else
+            git config user.name 'Icy Rose Website Bot'
+            git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+            git commit -m 'Sync item prices and recipes from website'
+            git push
+          fi
