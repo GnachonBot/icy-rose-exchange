@@ -1,7 +1,7 @@
 {
   "brand": "Icy Rose Exchange",
   "source": "prices.xlsx",
-  "generatedAt": "2026-11-10T17:31:51+00:00",
+  "generatedAt": "2026-11-13T20:38:46+00:00",
   "defaultBuyPercent": 0.5,
   "cash": {
     "stackValue": 1250.0,
@@ -13,9 +13,15 @@
       "name": "Advance Lock Pick",
       "group": "Normal Bench",
       "type": "item",
+      "canSell": true,
+      "canBuy": true,
       "craftCost": 115.0,
       "sellPrice": 250.0,
       "buyPrice": 125.0,
+      "customSellPrice": 250.0,
+      "buyFixed": null,
+      "buyPercent": null,
+      "shopSellOverride": null,
       "priceSource": "custom",
       "buySource": "percentage",
       "shopPrice": 250.0,
@@ -27,9 +33,15 @@
       "name": "Binoculars",
       "group": "Normal Bench",
       "type": "item",
+      "canSell": true,
+      "canBuy": true,
       "craftCost": 80.0,
       "sellPrice": 160.0,
       "buyPrice": 80.0,
+      "customSellPrice": null,
+      "buyFixed": null,
+      "buyPercent": null,
+      "shopSellOverride": null,
       "priceSource": "2x craft cost",
       "buySource": "percentage",
       "shopPrice": 160.0,
@@ -41,9 +53,15 @@
       "name": "Cable Ties",
       "group": "Normal Bench",
       "type": "item",
+      "canSell": true,
+      "canBuy": true,
       "craftCost": 130.0,
       "sellPrice": 260.0,
       "buyPrice": 130.0,
+      "customSellPrice": null,
+      "buyFixed": null,
+      "buyPercent": null,
+      "shopSellOverride": null,
       "priceSource": "2x craft cost",
       "buySource": "percentage",
       "shopPrice": 260.0,
@@ -55,9 +73,15 @@
       "name": "Lockpick",
       "group": "Normal Bench",
       "type": "item",
+      "canSell": true,
+      "canBuy": true,
       "craftCost": 50.0,
       "sellPrice": 100.0,
       "buyPrice": 50.0,
+      "customSellPrice": null,
+      "buyFixed": null,
+      "buyPercent": null,
+      "shopSellOverride": null,
       "priceSource": "2x craft cost",
       "buySource": "percentage",
       "shopPrice": 100.0,
@@ -69,9 +93,15 @@
       "name": "Heavy Armor",
       "group": "Normal Bench",
       "type": "item",
+      "canSell": true,
+      "canBuy": true,
       "craftCost": 291.0,
       "sellPrice": 2500.0,
       "buyPrice": 1250.0,
+      "customSellPrice": 2500.0,
+      "buyFixed": null,
+      "buyPercent": null,
+      "shopSellOverride": null,
       "priceSource": "custom",
       "buySource": "percentage",
       "shopPrice": 2500.0,
@@ -83,9 +113,15 @@
       "name": "Armour Plate",
       "group": "Normal Bench",
       "type": "item",
+      "canSell": true,
+      "canBuy": true,
       "craftCost": 163.0,
       "sellPrice": 500.0,
       "buyPrice": 250.0,
+      "customSellPrice": 500.0,
+      "buyFixed": null,
+      "buyPercent": null,
+      "shopSellOverride": null,
       "priceSource": "custom",
       "buySource": "percentage",
       "shopPrice": 500.0,
@@ -97,9 +133,15 @@
       "name": "Bag",
       "group": "Heist Bench",
       "type": "item",
+      "canSell": true,
+      "canBuy": true,
       "craftCost": 164.0,
       "sellPrice": 500.0,
       "buyPrice": 250.0,
+      "customSellPrice": 500.0,
+      "buyFixed": null,
+      "buyPercent": null,
+      "shopSellOverride": null,
       "priceSource": "custom",
       "buySource": "percentage",
       "shopPrice": 500.0,
@@ -111,9 +153,15 @@
       "name": "Burner Phone",
       "group": "Heist Bench",
       "type": "item",
+      "canSell": true,
+      "canBuy": true,
       "craftCost": 200.0,
       "sellPrice": 200.0,
       "buyPrice": 100.0,
+      "customSellPrice": 200.0,
+      "buyFixed": null,
+      "buyPercent": null,
+      "shopSellOverride": null,
       "priceSource": "custom",
       "buySource": "percentage",
       "shopPrice": 200.0,
@@ -125,9 +173,15 @@
       "name": "C4",
       "group": "Heist Bench",
       "type": "item",
+      "canSell": true,
+      "canBuy": true,
       "craftCost": 247.0,
       "sellPrice": 494.0,
       "buyPrice": 247.0,
+      "customSellPrice": null,
+      "buyFixed": null,
+      "buyPercent": null,
+      "shopSellOverride": null,
       "priceSource": "2x craft cost",
       "buySource": "percentage",
       "shopPrice": 494.0,
@@ -139,9 +193,15 @@
       "name": "Circuit Tester",
       "group": "Heist Bench",
       "type": "item",
+      "canSell": true,
+      "canBuy": true,
       "craftCost": 145.0,
       "sellPrice": 290.0,
       "buyPrice": 145.0,
+      "customSellPrice": null,
+      "buyFixed": null,
+      "buyPercent": null,
+      "shopSellOverride": null,
       "priceSource": "2x craft cost",
       "buySource": "percentage",
       "shopPrice": 290.0,
@@ -153,9 +213,15 @@
       "name": "Decrypted Device",
       "group": "Heist Bench",
       "type": "item",
+      "canSell": true,
+      "canBuy": true,
       "craftCost": 90.0,
       "sellPrice": 180.0,
       "buyPrice": 90.0,
+      "customSellPrice": null,
+      "buyFixed": null,
+      "buyPercent": null,
+      "shopSellOverride": null,
       "priceSource": "2x craft cost",
       "buySource": "percentage",
       "shopPrice": 180.0,
@@ -167,9 +233,15 @@
       "name": "Fake Card",
       "group": "Heist Bench",
       "type": "item",
+      "canSell": true,
+      "canBuy": true,
       "craftCost": 124.0,
       "sellPrice": 200.0,
       "buyPrice": 100.0,
+      "customSellPrice": 200.0,
+      "buyFixed": null,
+      "buyPercent": null,
+      "shopSellOverride": null,
       "priceSource": "custom",
       "buySource": "percentage",
       "shopPrice": 200.0,
@@ -181,9 +253,15 @@
       "name": "Gas Tank",
       "group": "Heist Bench",
       "type": "item",
+      "canSell": true,
+      "canBuy": true,
       "craftCost": 130.0,
       "sellPrice": 200.0,
       "buyPrice": 100.0,
+      "customSellPrice": 200.0,
+      "buyFixed": null,
+      "buyPercent": null,
+      "shopSellOverride": null,
       "priceSource": "custom",
       "buySource": "percentage",
       "shopPrice": 200.0,
@@ -195,9 +273,15 @@
       "name": "Glass Cutter",
       "group": "Heist Bench",
       "type": "item",
+      "canSell": true,
+      "canBuy": true,
       "craftCost": 195.0,
       "sellPrice": 390.0,
       "buyPrice": 195.0,
+      "customSellPrice": null,
+      "buyFixed": null,
+      "buyPercent": null,
+      "shopSellOverride": null,
       "priceSource": "2x craft cost",
       "buySource": "percentage",
       "shopPrice": 390.0,
@@ -209,9 +293,15 @@
       "name": "Laser Drill",
       "group": "Heist Bench",
       "type": "item",
+      "canSell": true,
+      "canBuy": true,
       "craftCost": 260.0,
       "sellPrice": 500.0,
       "buyPrice": 250.0,
+      "customSellPrice": 500.0,
+      "buyFixed": null,
+      "buyPercent": null,
+      "shopSellOverride": null,
       "priceSource": "custom",
       "buySource": "percentage",
       "shopPrice": 500.0,
@@ -223,9 +313,15 @@
       "name": "Pliers",
       "group": "Heist Bench",
       "type": "item",
+      "canSell": true,
+      "canBuy": true,
       "craftCost": 118.0,
       "sellPrice": 236.0,
       "buyPrice": 118.0,
+      "customSellPrice": null,
+      "buyFixed": null,
+      "buyPercent": null,
+      "shopSellOverride": null,
       "priceSource": "2x craft cost",
       "buySource": "percentage",
       "shopPrice": 236.0,
@@ -237,9 +333,15 @@
       "name": "Screwdriver Set",
       "group": "Heist Bench",
       "type": "item",
+      "canSell": true,
+      "canBuy": true,
       "craftCost": 120.0,
       "sellPrice": 200.0,
       "buyPrice": 100.0,
+      "customSellPrice": 200.0,
+      "buyFixed": null,
+      "buyPercent": null,
+      "shopSellOverride": null,
       "priceSource": "custom",
       "buySource": "percentage",
       "shopPrice": 200.0,
@@ -251,9 +353,15 @@
       "name": "Stethoscope",
       "group": "Heist Bench",
       "type": "item",
+      "canSell": true,
+      "canBuy": true,
       "craftCost": 214.0,
       "sellPrice": 500.0,
       "buyPrice": 250.0,
+      "customSellPrice": 500.0,
+      "buyFixed": null,
+      "buyPercent": null,
+      "shopSellOverride": null,
       "priceSource": "custom",
       "buySource": "percentage",
       "shopPrice": 500.0,
@@ -265,9 +373,15 @@
       "name": "Thermite",
       "group": "Heist Bench",
       "type": "item",
+      "canSell": true,
+      "canBuy": true,
       "craftCost": 150.0,
       "sellPrice": 300.0,
       "buyPrice": 150.0,
+      "customSellPrice": null,
+      "buyFixed": null,
+      "buyPercent": null,
+      "shopSellOverride": null,
       "priceSource": "2x craft cost",
       "buySource": "percentage",
       "shopPrice": 300.0,
@@ -279,9 +393,15 @@
       "name": "X Device",
       "group": "Heist Bench",
       "type": "item",
+      "canSell": true,
+      "canBuy": true,
       "craftCost": 110.0,
       "sellPrice": 220.0,
       "buyPrice": 110.0,
+      "customSellPrice": null,
+      "buyFixed": null,
+      "buyPercent": null,
+      "shopSellOverride": null,
       "priceSource": "2x craft cost",
       "buySource": "percentage",
       "shopPrice": 220.0,
@@ -293,9 +413,15 @@
       "name": "X Harddrive",
       "group": "Heist Bench",
       "type": "item",
+      "canSell": true,
+      "canBuy": true,
       "craftCost": 120.0,
       "sellPrice": 200.0,
       "buyPrice": 100.0,
+      "customSellPrice": 200.0,
+      "buyFixed": null,
+      "buyPercent": null,
+      "shopSellOverride": null,
       "priceSource": "custom",
       "buySource": "percentage",
       "shopPrice": 200.0,
@@ -307,9 +433,15 @@
       "name": "X Laptop",
       "group": "Heist Bench",
       "type": "item",
+      "canSell": true,
+      "canBuy": true,
       "craftCost": 225.0,
       "sellPrice": 350.0,
       "buyPrice": 175.0,
+      "customSellPrice": 350.0,
+      "buyFixed": null,
+      "buyPercent": null,
+      "shopSellOverride": null,
       "priceSource": "custom",
       "buySource": "percentage",
       "shopPrice": 350.0,
@@ -321,9 +453,15 @@
       "name": "X Phone",
       "group": "Heist Bench",
       "type": "item",
+      "canSell": true,
+      "canBuy": true,
       "craftCost": 80.0,
       "sellPrice": 160.0,
       "buyPrice": 80.0,
+      "customSellPrice": null,
+      "buyFixed": null,
+      "buyPercent": null,
+      "shopSellOverride": null,
       "priceSource": "2x craft cost",
       "buySource": "percentage",
       "shopPrice": 160.0,
@@ -335,9 +473,15 @@
       "name": "Large Backpack",
       "group": "Normal Bench",
       "type": "item",
+      "canSell": true,
+      "canBuy": true,
       "craftCost": 450.0,
       "sellPrice": 2000.0,
       "buyPrice": 1000.0,
+      "customSellPrice": 2000.0,
+      "buyFixed": null,
+      "buyPercent": null,
+      "shopSellOverride": null,
       "priceSource": "custom",
       "buySource": "percentage",
       "shopPrice": 2000.0,
@@ -349,9 +493,15 @@
       "name": "Trojan USB",
       "group": "Heist Bench",
       "type": "item",
+      "canSell": true,
+      "canBuy": true,
       "craftCost": 825.0,
       "sellPrice": 1650.0,
       "buyPrice": 825.0,
+      "customSellPrice": null,
+      "buyFixed": null,
+      "buyPercent": null,
+      "shopSellOverride": null,
       "priceSource": "2x craft cost",
       "buySource": "percentage",
       "shopPrice": 1650.0,
@@ -363,9 +513,15 @@
       "name": "Red Trojan Usb",
       "group": "Heist Bench",
       "type": "item",
+      "canSell": true,
+      "canBuy": true,
       "craftCost": 1015.0,
       "sellPrice": 2030.0,
       "buyPrice": 1015.0,
+      "customSellPrice": null,
+      "buyFixed": null,
+      "buyPercent": null,
+      "shopSellOverride": null,
       "priceSource": "2x craft cost",
       "buySource": "percentage",
       "shopPrice": 2030.0,
@@ -377,9 +533,15 @@
       "name": "Recyler Toolbox",
       "group": "Recycle Center",
       "type": "item",
+      "canSell": true,
+      "canBuy": true,
       "craftCost": 40.0,
       "sellPrice": 80.0,
       "buyPrice": 40.0,
+      "customSellPrice": null,
+      "buyFixed": null,
+      "buyPercent": null,
+      "shopSellOverride": null,
       "priceSource": "2x craft cost",
       "buySource": "percentage",
       "shopPrice": 80.0,
@@ -391,9 +553,15 @@
       "name": "Recyler Safe",
       "group": "Recycle Center",
       "type": "item",
+      "canSell": true,
+      "canBuy": true,
       "craftCost": 35.0,
       "sellPrice": 70.0,
       "buyPrice": 35.0,
+      "customSellPrice": null,
+      "buyFixed": null,
+      "buyPercent": null,
+      "shopSellOverride": null,
       "priceSource": "2x craft cost",
       "buySource": "percentage",
       "shopPrice": 70.0,
@@ -405,9 +573,15 @@
       "name": "Recyler Camera",
       "group": "Recycle Center",
       "type": "item",
+      "canSell": true,
+      "canBuy": true,
       "craftCost": 30.0,
       "sellPrice": 60.0,
       "buyPrice": 30.0,
+      "customSellPrice": null,
+      "buyFixed": null,
+      "buyPercent": null,
+      "shopSellOverride": null,
       "priceSource": "2x craft cost",
       "buySource": "percentage",
       "shopPrice": 60.0,
@@ -419,9 +593,15 @@
       "name": "Recycler PCB",
       "group": "Recycle Center",
       "type": "item",
+      "canSell": true,
+      "canBuy": true,
       "craftCost": 105.0,
       "sellPrice": 210.0,
       "buyPrice": 105.0,
+      "customSellPrice": null,
+      "buyFixed": null,
+      "buyPercent": null,
+      "shopSellOverride": null,
       "priceSource": "2x craft cost",
       "buySource": "percentage",
       "shopPrice": 210.0,
@@ -433,9 +613,15 @@
       "name": "Recyler Keyboard",
       "group": "Recycle Center",
       "type": "item",
+      "canSell": true,
+      "canBuy": true,
       "craftCost": 38.0,
       "sellPrice": 76.0,
       "buyPrice": 38.0,
+      "customSellPrice": null,
+      "buyFixed": null,
+      "buyPercent": null,
+      "shopSellOverride": null,
       "priceSource": "2x craft cost",
       "buySource": "percentage",
       "shopPrice": 76.0,
@@ -447,9 +633,15 @@
       "name": "Recyler PC",
       "group": "Recycle Center",
       "type": "item",
+      "canSell": true,
+      "canBuy": true,
       "craftCost": 65.0,
       "sellPrice": 130.0,
       "buyPrice": 65.0,
+      "customSellPrice": null,
+      "buyFixed": null,
+      "buyPercent": null,
+      "shopSellOverride": null,
       "priceSource": "2x craft cost",
       "buySource": "percentage",
       "shopPrice": 130.0,
@@ -461,9 +653,15 @@
       "name": "Slotmachine",
       "group": "Recycle Center",
       "type": "item",
+      "canSell": true,
+      "canBuy": true,
       "craftCost": 61.0,
       "sellPrice": 122.0,
       "buyPrice": 61.0,
+      "customSellPrice": null,
+      "buyFixed": null,
+      "buyPercent": null,
+      "shopSellOverride": null,
       "priceSource": "2x craft cost",
       "buySource": "percentage",
       "shopPrice": 122.0,
@@ -475,9 +673,15 @@
       "name": "Recyler PC Case",
       "group": "Recycle Center",
       "type": "item",
+      "canSell": true,
+      "canBuy": true,
       "craftCost": 70.0,
       "sellPrice": 140.0,
       "buyPrice": 70.0,
+      "customSellPrice": null,
+      "buyFixed": null,
+      "buyPercent": null,
+      "shopSellOverride": null,
       "priceSource": "2x craft cost",
       "buySource": "percentage",
       "shopPrice": 140.0,
@@ -489,9 +693,15 @@
       "name": "Recyler Wire",
       "group": "Recycle Center",
       "type": "item",
+      "canSell": true,
+      "canBuy": true,
       "craftCost": 76.0,
       "sellPrice": 152.0,
       "buyPrice": 76.0,
+      "customSellPrice": null,
+      "buyFixed": null,
+      "buyPercent": null,
+      "shopSellOverride": null,
       "priceSource": "2x craft cost",
       "buySource": "percentage",
       "shopPrice": 152.0,
@@ -503,9 +713,15 @@
       "name": "Music Player",
       "group": "Recycle Center",
       "type": "item",
+      "canSell": true,
+      "canBuy": true,
       "craftCost": 48.0,
       "sellPrice": 96.0,
       "buyPrice": 48.0,
+      "customSellPrice": null,
+      "buyFixed": null,
+      "buyPercent": null,
+      "shopSellOverride": null,
       "priceSource": "2x craft cost",
       "buySource": "percentage",
       "shopPrice": 96.0,
@@ -517,9 +733,15 @@
       "name": "Rotor",
       "group": "Recycle Center",
       "type": "item",
+      "canSell": true,
+      "canBuy": true,
       "craftCost": 43.0,
       "sellPrice": 86.0,
       "buyPrice": 43.0,
+      "customSellPrice": null,
+      "buyFixed": null,
+      "buyPercent": null,
+      "shopSellOverride": null,
       "priceSource": "2x craft cost",
       "buySource": "percentage",
       "shopPrice": 86.0,
@@ -531,9 +753,15 @@
       "name": "Power Regulator",
       "group": "Recycle Center",
       "type": "item",
+      "canSell": true,
+      "canBuy": true,
       "craftCost": 55.0,
       "sellPrice": 110.0,
       "buyPrice": 55.0,
+      "customSellPrice": null,
+      "buyFixed": null,
+      "buyPercent": null,
+      "shopSellOverride": null,
       "priceSource": "2x craft cost",
       "buySource": "percentage",
       "shopPrice": 110.0,
@@ -545,9 +773,15 @@
       "name": "Industrial Hinge",
       "group": "Recycle Center",
       "type": "item",
+      "canSell": true,
+      "canBuy": true,
       "craftCost": 65.0,
       "sellPrice": 130.0,
       "buyPrice": 65.0,
+      "customSellPrice": null,
+      "buyFixed": null,
+      "buyPercent": null,
+      "shopSellOverride": null,
       "priceSource": "2x craft cost",
       "buySource": "percentage",
       "shopPrice": 130.0,
@@ -559,9 +793,15 @@
       "name": "Industrial Controlboard",
       "group": "Recycle Center",
       "type": "item",
+      "canSell": true,
+      "canBuy": true,
       "craftCost": 76.0,
       "sellPrice": 152.0,
       "buyPrice": 76.0,
+      "customSellPrice": null,
+      "buyFixed": null,
+      "buyPercent": null,
+      "shopSellOverride": null,
       "priceSource": "2x craft cost",
       "buySource": "percentage",
       "shopPrice": 152.0,
@@ -573,9 +813,15 @@
       "name": "High Torque Motor",
       "group": "Recycle Center",
       "type": "item",
+      "canSell": true,
+      "canBuy": true,
       "craftCost": 45.0,
       "sellPrice": 90.0,
       "buyPrice": 45.0,
+      "customSellPrice": null,
+      "buyFixed": null,
+      "buyPercent": null,
+      "shopSellOverride": null,
       "priceSource": "2x craft cost",
       "buySource": "percentage",
       "shopPrice": 90.0,
@@ -587,9 +833,15 @@
       "name": "Industrial Blades",
       "group": "Recycle Center",
       "type": "item",
+      "canSell": true,
+      "canBuy": true,
       "craftCost": 76.0,
       "sellPrice": 152.0,
       "buyPrice": 76.0,
+      "customSellPrice": null,
+      "buyFixed": null,
+      "buyPercent": null,
+      "shopSellOverride": null,
       "priceSource": "2x craft cost",
       "buySource": "percentage",
       "shopPrice": 152.0,
@@ -603,7 +855,12 @@
       "name": "Bank Card",
       "group": "Materials",
       "type": "material",
+      "canSell": true,
+      "canBuy": true,
       "craftCost": null,
+      "materialCost": 10.0,
+      "customSellPrice": null,
+      "shopSellOverride": null,
       "sellPrice": 10.0,
       "buyPrice": 5.0,
       "priceSource": "material",
@@ -617,7 +874,12 @@
       "name": "Battery Cell",
       "group": "Materials",
       "type": "material",
+      "canSell": true,
+      "canBuy": true,
       "craftCost": null,
+      "materialCost": 20.0,
+      "customSellPrice": null,
+      "shopSellOverride": null,
       "sellPrice": 20.0,
       "buyPrice": 10.0,
       "priceSource": "material",
@@ -631,7 +893,12 @@
       "name": "Circuit Board",
       "group": "Materials",
       "type": "material",
+      "canSell": true,
+      "canBuy": true,
       "craftCost": null,
+      "materialCost": 25.0,
+      "customSellPrice": null,
+      "shopSellOverride": null,
       "sellPrice": 25.0,
       "buyPrice": 15.0,
       "priceSource": "material",
@@ -645,7 +912,12 @@
       "name": "Circuit Wire",
       "group": "Materials",
       "type": "material",
+      "canSell": true,
+      "canBuy": true,
       "craftCost": null,
+      "materialCost": 50.0,
+      "customSellPrice": null,
+      "shopSellOverride": null,
       "sellPrice": 50.0,
       "buyPrice": 25.0,
       "priceSource": "material",
@@ -659,7 +931,12 @@
       "name": "Bandge",
       "group": "Materials",
       "type": "material",
+      "canSell": true,
+      "canBuy": true,
       "craftCost": null,
+      "materialCost": 125.0,
+      "customSellPrice": null,
+      "shopSellOverride": null,
       "sellPrice": 125.0,
       "buyPrice": 75.0,
       "priceSource": "material",
@@ -673,7 +950,12 @@
       "name": "Copper Wire",
       "group": "Materials",
       "type": "material",
+      "canSell": true,
+      "canBuy": true,
       "craftCost": null,
+      "materialCost": 50.0,
+      "customSellPrice": null,
+      "shopSellOverride": null,
       "sellPrice": 50.0,
       "buyPrice": 25.0,
       "priceSource": "material",
@@ -687,7 +969,12 @@
       "name": "Glass",
       "group": "Materials",
       "type": "material",
+      "canSell": true,
+      "canBuy": true,
       "craftCost": null,
+      "materialCost": 10.0,
+      "customSellPrice": null,
+      "shopSellOverride": null,
       "sellPrice": 10.0,
       "buyPrice": 3.0,
       "priceSource": "material",
@@ -701,7 +988,12 @@
       "name": "Harddrive",
       "group": "Materials",
       "type": "material",
+      "canSell": true,
+      "canBuy": true,
       "craftCost": null,
+      "materialCost": 25.0,
+      "customSellPrice": null,
+      "shopSellOverride": null,
       "sellPrice": 25.0,
       "buyPrice": 15.0,
       "priceSource": "material",
@@ -715,7 +1007,12 @@
       "name": "Lens",
       "group": "Materials",
       "type": "material",
+      "canSell": true,
+      "canBuy": true,
       "craftCost": null,
+      "materialCost": 10.0,
+      "customSellPrice": null,
+      "shopSellOverride": null,
       "sellPrice": 10.0,
       "buyPrice": 3.0,
       "priceSource": "material",
@@ -729,7 +1026,12 @@
       "name": "Nylon Rope",
       "group": "Materials",
       "type": "material",
+      "canSell": true,
+      "canBuy": true,
       "craftCost": null,
+      "materialCost": 50.0,
+      "customSellPrice": null,
+      "shopSellOverride": null,
       "sellPrice": 50.0,
       "buyPrice": 25.0,
       "priceSource": "material",
@@ -743,7 +1045,12 @@
       "name": "Phone Chip",
       "group": "Materials",
       "type": "material",
+      "canSell": true,
+      "canBuy": true,
       "craftCost": null,
+      "materialCost": 20.0,
+      "customSellPrice": null,
+      "shopSellOverride": null,
       "sellPrice": 20.0,
       "buyPrice": 10.0,
       "priceSource": "material",
@@ -757,7 +1064,12 @@
       "name": "Plastic",
       "group": "Materials",
       "type": "material",
+      "canSell": true,
+      "canBuy": true,
       "craftCost": null,
+      "materialCost": 20.0,
+      "customSellPrice": null,
+      "shopSellOverride": null,
       "sellPrice": 20.0,
       "buyPrice": 10.0,
       "priceSource": "material",
@@ -771,7 +1083,12 @@
       "name": "Rubber",
       "group": "Materials",
       "type": "material",
+      "canSell": true,
+      "canBuy": true,
       "craftCost": null,
+      "materialCost": 18.0,
+      "customSellPrice": null,
+      "shopSellOverride": null,
       "sellPrice": 18.0,
       "buyPrice": 9.0,
       "priceSource": "material",
@@ -785,7 +1102,12 @@
       "name": "Oxy",
       "group": "Materials",
       "type": "material",
+      "canSell": true,
+      "canBuy": true,
       "craftCost": null,
+      "materialCost": 500.0,
+      "customSellPrice": null,
+      "shopSellOverride": null,
       "sellPrice": 500.0,
       "buyPrice": 125.0,
       "priceSource": "material",
@@ -799,7 +1121,12 @@
       "name": "Scrap Metal",
       "group": "Materials",
       "type": "material",
+      "canSell": true,
+      "canBuy": true,
       "craftCost": null,
+      "materialCost": 15.0,
+      "customSellPrice": null,
+      "shopSellOverride": null,
       "sellPrice": 15.0,
       "buyPrice": 7.0,
       "priceSource": "material",
@@ -813,7 +1140,12 @@
       "name": "Screws",
       "group": "Materials",
       "type": "material",
+      "canSell": true,
+      "canBuy": true,
       "craftCost": null,
+      "materialCost": 25.0,
+      "customSellPrice": null,
+      "shopSellOverride": null,
       "sellPrice": 25.0,
       "buyPrice": 12.0,
       "priceSource": "material",
@@ -827,7 +1159,12 @@
       "name": "Steel",
       "group": "Materials",
       "type": "material",
+      "canSell": true,
+      "canBuy": true,
       "craftCost": null,
+      "materialCost": 25.0,
+      "customSellPrice": null,
+      "shopSellOverride": null,
       "sellPrice": 25.0,
       "buyPrice": 12.0,
       "priceSource": "material",
@@ -841,7 +1178,12 @@
       "name": "Oxy (50%)",
       "group": "Materials",
       "type": "material",
+      "canSell": true,
+      "canBuy": true,
       "craftCost": null,
+      "materialCost": 350.0,
+      "customSellPrice": null,
+      "shopSellOverride": null,
       "sellPrice": 350.0,
       "buyPrice": 75.0,
       "priceSource": "material",
@@ -855,7 +1197,12 @@
       "name": "Lockpicks",
       "group": "Materials",
       "type": "material",
+      "canSell": true,
+      "canBuy": true,
       "craftCost": null,
+      "materialCost": 100.0,
+      "customSellPrice": null,
+      "shopSellOverride": null,
       "sellPrice": 100.0,
       "buyPrice": 0.0,
       "priceSource": "material",
@@ -869,7 +1216,12 @@
       "name": "Advance Lock Picks",
       "group": "Materials",
       "type": "material",
+      "canSell": true,
+      "canBuy": true,
       "craftCost": null,
+      "materialCost": 250.0,
+      "customSellPrice": null,
+      "shopSellOverride": null,
       "sellPrice": 250.0,
       "buyPrice": 0.0,
       "priceSource": "material",
@@ -883,7 +1235,12 @@
       "name": "Gun Part",
       "group": "Materials",
       "type": "material",
+      "canSell": true,
+      "canBuy": true,
       "craftCost": null,
+      "materialCost": 1000.0,
+      "customSellPrice": null,
+      "shopSellOverride": null,
       "sellPrice": 1000.0,
       "buyPrice": 100.0,
       "priceSource": "material",
@@ -897,7 +1254,12 @@
       "name": "Liberator",
       "group": "Materials",
       "type": "material",
+      "canSell": true,
+      "canBuy": true,
       "craftCost": null,
+      "materialCost": 250.0,
+      "customSellPrice": null,
+      "shopSellOverride": null,
       "sellPrice": 250.0,
       "buyPrice": 50.0,
       "priceSource": "material",
@@ -911,7 +1273,12 @@
       "name": "Boost USB",
       "group": "Materials",
       "type": "material",
+      "canSell": true,
+      "canBuy": true,
       "craftCost": null,
+      "materialCost": 1000.0,
+      "customSellPrice": null,
+      "shopSellOverride": null,
       "sellPrice": 1000.0,
       "buyPrice": 250.0,
       "priceSource": "material",
@@ -925,7 +1292,12 @@
       "name": "Car Radio",
       "group": "Materials",
       "type": "material",
+      "canSell": true,
+      "canBuy": true,
       "craftCost": null,
+      "materialCost": 100.0,
+      "customSellPrice": null,
+      "shopSellOverride": null,
       "sellPrice": 100.0,
       "buyPrice": 50.0,
       "priceSource": "material",
@@ -939,7 +1311,12 @@
       "name": "Broken Radio",
       "group": "Materials",
       "type": "material",
+      "canSell": true,
+      "canBuy": true,
       "craftCost": null,
+      "materialCost": 100.0,
+      "customSellPrice": null,
+      "shopSellOverride": null,
       "sellPrice": 100.0,
       "buyPrice": 25.0,
       "priceSource": "material",
@@ -953,7 +1330,12 @@
       "name": "Stolen Phone",
       "group": "Materials",
       "type": "material",
+      "canSell": true,
+      "canBuy": true,
       "craftCost": null,
+      "materialCost": 100.0,
+      "customSellPrice": null,
+      "shopSellOverride": null,
       "sellPrice": 100.0,
       "buyPrice": 25.0,
       "priceSource": "material",
@@ -967,7 +1349,12 @@
       "name": "Broken Phone",
       "group": "Materials",
       "type": "material",
+      "canSell": true,
+      "canBuy": true,
       "craftCost": null,
+      "materialCost": 100.0,
+      "customSellPrice": null,
+      "shopSellOverride": null,
       "sellPrice": 100.0,
       "buyPrice": 20.0,
       "priceSource": "material",
@@ -981,7 +1368,12 @@
       "name": "Bandge (50%)",
       "group": "Materials",
       "type": "material",
+      "canSell": true,
+      "canBuy": true,
       "craftCost": null,
+      "materialCost": 75.0,
+      "customSellPrice": null,
+      "shopSellOverride": null,
       "sellPrice": 75.0,
       "buyPrice": 25.0,
       "priceSource": "material",
@@ -989,6 +1381,998 @@
       "shopPrice": 75.0,
       "hasShopOverride": false,
       "displayName": "Bandge (50%)"
+    }
+  ],
+  "recipes": [
+    {
+      "itemId": "item:NB-001",
+      "itemName": "Advance Lock Pick",
+      "bench": "Normal Bench",
+      "ingredients": [
+        {
+          "id": "material:plastic",
+          "name": "Plastic",
+          "qty": 2.0,
+          "known": true
+        },
+        {
+          "id": "material:screws",
+          "name": "Screws",
+          "qty": 1.0,
+          "known": true
+        },
+        {
+          "id": "material:steel",
+          "name": "Steel",
+          "qty": 2.0,
+          "known": true
+        }
+      ],
+      "complete": true
+    },
+    {
+      "itemId": "item:NB-002",
+      "itemName": "Binoculars",
+      "bench": "Normal Bench",
+      "ingredients": [
+        {
+          "id": "material:glass",
+          "name": "Glass",
+          "qty": 2.0,
+          "known": true
+        },
+        {
+          "id": "material:lens",
+          "name": "Lens",
+          "qty": 2.0,
+          "known": true
+        },
+        {
+          "id": "material:plastic",
+          "name": "Plastic",
+          "qty": 2.0,
+          "known": true
+        }
+      ],
+      "complete": true
+    },
+    {
+      "itemId": "item:NB-003",
+      "itemName": "Cable Ties",
+      "bench": "Normal Bench",
+      "ingredients": [
+        {
+          "id": "material:plastic",
+          "name": "Plastic",
+          "qty": 4.0,
+          "known": true
+        },
+        {
+          "id": "material:steel",
+          "name": "Steel",
+          "qty": 2.0,
+          "known": true
+        }
+      ],
+      "complete": true
+    },
+    {
+      "itemId": "item:NB-004",
+      "itemName": "Lockpick",
+      "bench": "Normal Bench",
+      "ingredients": [
+        {
+          "id": "material:plastic",
+          "name": "Plastic",
+          "qty": 1.0,
+          "known": true
+        },
+        {
+          "id": "material:scrap metal",
+          "name": "Scrap Metal",
+          "qty": 2.0,
+          "known": true
+        }
+      ],
+      "complete": true
+    },
+    {
+      "itemId": "item:NB-005",
+      "itemName": "Heavy Armor",
+      "bench": "Normal Bench",
+      "ingredients": [
+        {
+          "id": "material:nylon rope",
+          "name": "Nylon Rope",
+          "qty": 2.0,
+          "known": true
+        },
+        {
+          "id": "material:plastic",
+          "name": "Plastic",
+          "qty": 4.0,
+          "known": true
+        },
+        {
+          "id": "material:rubber",
+          "name": "Rubber",
+          "qty": 2.0,
+          "known": true
+        },
+        {
+          "id": "material:steel",
+          "name": "Steel",
+          "qty": 3.0,
+          "known": true
+        }
+      ],
+      "complete": true
+    },
+    {
+      "itemId": "item:NB-006",
+      "itemName": "Armour Plate",
+      "bench": "Normal Bench",
+      "ingredients": [
+        {
+          "id": "material:rubber",
+          "name": "Rubber",
+          "qty": 1.0,
+          "known": true
+        },
+        {
+          "id": "material:scrap metal",
+          "name": "Scrap Metal",
+          "qty": 3.0,
+          "known": true
+        },
+        {
+          "id": "material:steel",
+          "name": "Steel",
+          "qty": 4.0,
+          "known": true
+        }
+      ],
+      "complete": true
+    },
+    {
+      "itemId": "item:HB-001",
+      "itemName": "Bag",
+      "bench": "Heist Bench",
+      "ingredients": [
+        {
+          "id": "material:plastic",
+          "name": "Plastic",
+          "qty": 4.0,
+          "known": true
+        },
+        {
+          "id": "material:rubber",
+          "name": "Rubber",
+          "qty": 3.0,
+          "known": true
+        },
+        {
+          "id": "material:scrap metal",
+          "name": "Scrap Metal",
+          "qty": 2.0,
+          "known": true
+        }
+      ],
+      "complete": true
+    },
+    {
+      "itemId": "item:HB-002",
+      "itemName": "Burner Phone",
+      "bench": "Heist Bench",
+      "ingredients": [
+        {
+          "id": "material:circuit wire",
+          "name": "Circuit Wire",
+          "qty": 2.0,
+          "known": true
+        },
+        {
+          "id": "material:phone chip",
+          "name": "Phone Chip",
+          "qty": 1.0,
+          "known": true
+        },
+        {
+          "id": "material:plastic",
+          "name": "Plastic",
+          "qty": 4.0,
+          "known": true
+        }
+      ],
+      "complete": true
+    },
+    {
+      "itemId": "item:HB-003",
+      "itemName": "C4",
+      "bench": "Heist Bench",
+      "ingredients": [
+        {
+          "id": "material:circuit board",
+          "name": "Circuit Board",
+          "qty": 1.0,
+          "known": true
+        },
+        {
+          "id": "material:copper wire",
+          "name": "Copper Wire",
+          "qty": 3.0,
+          "known": true
+        },
+        {
+          "id": "material:rubber",
+          "name": "Rubber",
+          "qty": 4.0,
+          "known": true
+        }
+      ],
+      "complete": true
+    },
+    {
+      "itemId": "item:HB-004",
+      "itemName": "Circuit Tester",
+      "bench": "Heist Bench",
+      "ingredients": [
+        {
+          "id": "material:battery cell",
+          "name": "Battery Cell",
+          "qty": 1.0,
+          "known": true
+        },
+        {
+          "id": "material:circuit board",
+          "name": "Circuit Board",
+          "qty": 1.0,
+          "known": true
+        },
+        {
+          "id": "material:copper wire",
+          "name": "Copper Wire",
+          "qty": 2.0,
+          "known": true
+        }
+      ],
+      "complete": true
+    },
+    {
+      "itemId": "item:HB-005",
+      "itemName": "Decrypted Device",
+      "bench": "Heist Bench",
+      "ingredients": [
+        {
+          "id": "material:circuit wire",
+          "name": "Circuit Wire",
+          "qty": 1.0,
+          "known": true
+        },
+        {
+          "id": "material:phone chip",
+          "name": "Phone Chip",
+          "qty": 1.0,
+          "known": true
+        },
+        {
+          "id": "material:plastic",
+          "name": "Plastic",
+          "qty": 1.0,
+          "known": true
+        }
+      ],
+      "complete": true
+    },
+    {
+      "itemId": "item:HB-006",
+      "itemName": "Fake Card",
+      "bench": "Heist Bench",
+      "ingredients": [
+        {
+          "id": "material:bank card",
+          "name": "Bank Card",
+          "qty": 1.0,
+          "known": true
+        },
+        {
+          "id": "material:plastic",
+          "name": "Plastic",
+          "qty": 3.0,
+          "known": true
+        },
+        {
+          "id": "material:rubber",
+          "name": "Rubber",
+          "qty": 3.0,
+          "known": true
+        }
+      ],
+      "complete": true
+    },
+    {
+      "itemId": "item:HB-007",
+      "itemName": "Gas Tank",
+      "bench": "Heist Bench",
+      "ingredients": [
+        {
+          "id": "material:battery cell",
+          "name": "Battery Cell",
+          "qty": 1.0,
+          "known": true
+        },
+        {
+          "id": "material:scrap metal",
+          "name": "Scrap Metal",
+          "qty": 4.0,
+          "known": true
+        },
+        {
+          "id": "material:steel",
+          "name": "Steel",
+          "qty": 2.0,
+          "known": true
+        }
+      ],
+      "complete": true
+    },
+    {
+      "itemId": "item:HB-008",
+      "itemName": "Glass Cutter",
+      "bench": "Heist Bench",
+      "ingredients": [
+        {
+          "id": "material:copper wire",
+          "name": "Copper Wire",
+          "qty": 2.0,
+          "known": true
+        },
+        {
+          "id": "material:glass",
+          "name": "Glass",
+          "qty": 2.0,
+          "known": true
+        },
+        {
+          "id": "material:steel",
+          "name": "Steel",
+          "qty": 3.0,
+          "known": true
+        }
+      ],
+      "complete": true
+    },
+    {
+      "itemId": "item:HB-009",
+      "itemName": "Laser Drill",
+      "bench": "Heist Bench",
+      "ingredients": [
+        {
+          "id": "material:copper wire",
+          "name": "Copper Wire",
+          "qty": 2.0,
+          "known": true
+        },
+        {
+          "id": "material:plastic",
+          "name": "Plastic",
+          "qty": 3.0,
+          "known": true
+        },
+        {
+          "id": "material:steel",
+          "name": "Steel",
+          "qty": 4.0,
+          "known": true
+        }
+      ],
+      "complete": true
+    },
+    {
+      "itemId": "item:HB-010",
+      "itemName": "Pliers",
+      "bench": "Heist Bench",
+      "ingredients": [
+        {
+          "id": "material:rubber",
+          "name": "Rubber",
+          "qty": 1.0,
+          "known": true
+        },
+        {
+          "id": "material:screws",
+          "name": "Screws",
+          "qty": 2.0,
+          "known": true
+        },
+        {
+          "id": "material:steel",
+          "name": "Steel",
+          "qty": 2.0,
+          "known": true
+        }
+      ],
+      "complete": true
+    },
+    {
+      "itemId": "item:HB-011",
+      "itemName": "Screwdriver Set",
+      "bench": "Heist Bench",
+      "ingredients": [
+        {
+          "id": "material:plastic",
+          "name": "Plastic",
+          "qty": 1.0,
+          "known": true
+        },
+        {
+          "id": "material:screws",
+          "name": "Screws",
+          "qty": 2.0,
+          "known": true
+        },
+        {
+          "id": "material:steel",
+          "name": "Steel",
+          "qty": 2.0,
+          "known": true
+        }
+      ],
+      "complete": true
+    },
+    {
+      "itemId": "item:HB-012",
+      "itemName": "Stethoscope",
+      "bench": "Heist Bench",
+      "ingredients": [
+        {
+          "id": "material:plastic",
+          "name": "Plastic",
+          "qty": 3.0,
+          "known": true
+        },
+        {
+          "id": "material:rubber",
+          "name": "Rubber",
+          "qty": 3.0,
+          "known": true
+        },
+        {
+          "id": "material:steel",
+          "name": "Steel",
+          "qty": 4.0,
+          "known": true
+        }
+      ],
+      "complete": true
+    },
+    {
+      "itemId": "item:HB-013",
+      "itemName": "Thermite",
+      "bench": "Heist Bench",
+      "ingredients": [
+        {
+          "id": "material:copper wire",
+          "name": "Copper Wire",
+          "qty": 2.0,
+          "known": true
+        },
+        {
+          "id": "material:steel",
+          "name": "Steel",
+          "qty": 2.0,
+          "known": true
+        }
+      ],
+      "complete": true
+    },
+    {
+      "itemId": "item:HB-014",
+      "itemName": "X Device",
+      "bench": "Heist Bench",
+      "ingredients": [
+        {
+          "id": "material:battery cell",
+          "name": "Battery Cell",
+          "qty": 2.0,
+          "known": true
+        },
+        {
+          "id": "material:copper wire",
+          "name": "Copper Wire",
+          "qty": 1.0,
+          "known": true
+        },
+        {
+          "id": "material:phone chip",
+          "name": "Phone Chip",
+          "qty": 1.0,
+          "known": true
+        }
+      ],
+      "complete": true
+    },
+    {
+      "itemId": "item:HB-015",
+      "itemName": "X Harddrive",
+      "bench": "Heist Bench",
+      "ingredients": [
+        {
+          "id": "material:circuit board",
+          "name": "Circuit Board",
+          "qty": 2.0,
+          "known": true
+        },
+        {
+          "id": "material:harddrive",
+          "name": "Harddrive",
+          "qty": 2.0,
+          "known": true
+        },
+        {
+          "id": "material:phone chip",
+          "name": "Phone Chip",
+          "qty": 1.0,
+          "known": true
+        }
+      ],
+      "complete": true
+    },
+    {
+      "itemId": "item:HB-016",
+      "itemName": "X Laptop",
+      "bench": "Heist Bench",
+      "ingredients": [
+        {
+          "id": "material:circuit wire",
+          "name": "Circuit Wire",
+          "qty": 2.0,
+          "known": true
+        },
+        {
+          "id": "material:plastic",
+          "name": "Plastic",
+          "qty": 4.0,
+          "known": true
+        },
+        {
+          "id": "material:scrap metal",
+          "name": "Scrap Metal",
+          "qty": 3.0,
+          "known": true
+        }
+      ],
+      "complete": true
+    },
+    {
+      "itemId": "item:HB-017",
+      "itemName": "X Phone",
+      "bench": "Heist Bench",
+      "ingredients": [
+        {
+          "id": "material:battery cell",
+          "name": "Battery Cell",
+          "qty": 1.0,
+          "known": true
+        },
+        {
+          "id": "material:phone chip",
+          "name": "Phone Chip",
+          "qty": 1.0,
+          "known": true
+        },
+        {
+          "id": "material:plastic",
+          "name": "Plastic",
+          "qty": 2.0,
+          "known": true
+        }
+      ],
+      "complete": true
+    },
+    {
+      "itemId": "item:HB-018",
+      "itemName": "Large Backpack",
+      "bench": "Normal Bench",
+      "ingredients": [
+        {
+          "id": "material:steel",
+          "name": "Steel",
+          "qty": 2.0,
+          "known": true
+        },
+        {
+          "id": "material:plastic",
+          "name": "Plastic",
+          "qty": 8.0,
+          "known": true
+        },
+        {
+          "id": "material:rubber",
+          "name": "Rubber",
+          "qty": 5.0,
+          "known": true
+        },
+        {
+          "id": "material:nylon rope",
+          "name": "Nylon Rope",
+          "qty": 3.0,
+          "known": true
+        }
+      ],
+      "complete": true
+    },
+    {
+      "itemId": "item:HB-019",
+      "itemName": "Trojan USB",
+      "bench": "Heist Bench",
+      "ingredients": [
+        {
+          "id": "material:circuit wire",
+          "name": "Circuit Wire",
+          "qty": 6.0,
+          "known": true
+        },
+        {
+          "id": "material:plastic",
+          "name": "Plastic",
+          "qty": 10.0,
+          "known": true
+        },
+        {
+          "id": "material:steel",
+          "name": "Steel",
+          "qty": 13.0,
+          "known": true
+        }
+      ],
+      "complete": true
+    },
+    {
+      "itemId": "item:HB-020",
+      "itemName": "Red Trojan Usb",
+      "bench": "Heist Bench",
+      "ingredients": [
+        {
+          "id": "material:circuit wire",
+          "name": "Circuit Wire",
+          "qty": 8.0,
+          "known": true
+        },
+        {
+          "id": "material:plastic",
+          "name": "Plastic",
+          "qty": 12.0,
+          "known": true
+        },
+        {
+          "id": "material:steel",
+          "name": "Steel",
+          "qty": 15.0,
+          "known": true
+        }
+      ],
+      "complete": true
+    },
+    {
+      "itemId": "item:RC-001",
+      "itemName": "Recyler Toolbox",
+      "bench": "Recycle Center",
+      "ingredients": [
+        {
+          "id": "material:steel",
+          "name": "Steel",
+          "qty": 1.0,
+          "known": true
+        },
+        {
+          "id": "material:scrap metal",
+          "name": "Scrap Metal",
+          "qty": 1.0,
+          "known": true
+        }
+      ],
+      "complete": true
+    },
+    {
+      "itemId": "item:RC-002",
+      "itemName": "Recyler Safe",
+      "bench": "Recycle Center",
+      "ingredients": [
+        {
+          "id": "material:glass",
+          "name": "Glass",
+          "qty": 2.0,
+          "known": true
+        },
+        {
+          "id": "material:scrap metal",
+          "name": "Scrap Metal",
+          "qty": 1.0,
+          "known": true
+        }
+      ],
+      "complete": true
+    },
+    {
+      "itemId": "item:RC-003",
+      "itemName": "Recyler Camera",
+      "bench": "Recycle Center",
+      "ingredients": [
+        {
+          "id": "material:glass",
+          "name": "Glass",
+          "qty": 1.0,
+          "known": true
+        },
+        {
+          "id": "material:plastic",
+          "name": "Plastic",
+          "qty": 1.0,
+          "known": true
+        }
+      ],
+      "complete": true
+    },
+    {
+      "itemId": "item:RC-004",
+      "itemName": "Recycler PCB",
+      "bench": "Recycle Center",
+      "ingredients": [
+        {
+          "id": "material:glass",
+          "name": "Glass",
+          "qty": 3.0,
+          "known": true
+        },
+        {
+          "id": "material:scrap metal",
+          "name": "Scrap Metal",
+          "qty": 5.0,
+          "known": true
+        }
+      ],
+      "complete": true
+    },
+    {
+      "itemId": "item:RC-005",
+      "itemName": "Recyler Keyboard",
+      "bench": "Recycle Center",
+      "ingredients": [
+        {
+          "id": "material:plastic",
+          "name": "Plastic",
+          "qty": 1.0,
+          "known": true
+        },
+        {
+          "id": "material:rubber",
+          "name": "Rubber",
+          "qty": 1.0,
+          "known": true
+        }
+      ],
+      "complete": true
+    },
+    {
+      "itemId": "item:RC-006",
+      "itemName": "Recyler PC",
+      "bench": "Recycle Center",
+      "ingredients": [
+        {
+          "id": "material:steel",
+          "name": "Steel",
+          "qty": 1.0,
+          "known": true
+        },
+        {
+          "id": "material:plastic",
+          "name": "Plastic",
+          "qty": 2.0,
+          "known": true
+        }
+      ],
+      "complete": true
+    },
+    {
+      "itemId": "item:RC-007",
+      "itemName": "Slotmachine",
+      "bench": "Recycle Center",
+      "ingredients": [
+        {
+          "id": "material:steel",
+          "name": "Steel",
+          "qty": 1.0,
+          "known": true
+        },
+        {
+          "id": "material:rubber",
+          "name": "Rubber",
+          "qty": 2.0,
+          "known": true
+        }
+      ],
+      "complete": true
+    },
+    {
+      "itemId": "item:RC-008",
+      "itemName": "Recyler PC Case",
+      "bench": "Recycle Center",
+      "ingredients": [
+        {
+          "id": "material:steel",
+          "name": "Steel",
+          "qty": 2.0,
+          "known": true
+        },
+        {
+          "id": "material:glass",
+          "name": "Glass",
+          "qty": 2.0,
+          "known": true
+        }
+      ],
+      "complete": true
+    },
+    {
+      "itemId": "item:RC-009",
+      "itemName": "Recyler Wire",
+      "bench": "Recycle Center",
+      "ingredients": [
+        {
+          "id": "material:rubber",
+          "name": "Rubber",
+          "qty": 2.0,
+          "known": true
+        },
+        {
+          "id": "material:plastic",
+          "name": "Plastic",
+          "qty": 2.0,
+          "known": true
+        }
+      ],
+      "complete": true
+    },
+    {
+      "itemId": "item:RC-010",
+      "itemName": "Music Player",
+      "bench": "Recycle Center",
+      "ingredients": [
+        {
+          "id": "material:rubber",
+          "name": "Rubber",
+          "qty": 1.0,
+          "known": true
+        },
+        {
+          "id": "material:scrap metal",
+          "name": "Scrap Metal",
+          "qty": 2.0,
+          "known": true
+        }
+      ],
+      "complete": true
+    },
+    {
+      "itemId": "item:RC-011",
+      "itemName": "Rotor",
+      "bench": "Recycle Center",
+      "ingredients": [
+        {
+          "id": "material:steel",
+          "name": "Steel",
+          "qty": 1.0,
+          "known": true
+        },
+        {
+          "id": "material:rubber",
+          "name": "Rubber",
+          "qty": 1.0,
+          "known": true
+        }
+      ],
+      "complete": true
+    },
+    {
+      "itemId": "item:RC-012",
+      "itemName": "Power Regulator",
+      "bench": "Recycle Center",
+      "ingredients": [
+        {
+          "id": "material:plastic",
+          "name": "Plastic",
+          "qty": 2.0,
+          "known": true
+        },
+        {
+          "id": "material:scrap metal",
+          "name": "Scrap Metal",
+          "qty": 1.0,
+          "known": true
+        }
+      ],
+      "complete": true
+    },
+    {
+      "itemId": "item:RC-013",
+      "itemName": "Industrial Hinge",
+      "bench": "Recycle Center",
+      "ingredients": [
+        {
+          "id": "material:steel",
+          "name": "Steel",
+          "qty": 2.0,
+          "known": true
+        },
+        {
+          "id": "material:scrap metal",
+          "name": "Scrap Metal",
+          "qty": 1.0,
+          "known": true
+        }
+      ],
+      "complete": true
+    },
+    {
+      "itemId": "item:RC-014",
+      "itemName": "Industrial Controlboard",
+      "bench": "Recycle Center",
+      "ingredients": [
+        {
+          "id": "material:plastic",
+          "name": "Plastic",
+          "qty": 2.0,
+          "known": true
+        },
+        {
+          "id": "material:rubber",
+          "name": "Rubber",
+          "qty": 2.0,
+          "known": true
+        }
+      ],
+      "complete": true
+    },
+    {
+      "itemId": "item:RC-015",
+      "itemName": "High Torque Motor",
+      "bench": "Recycle Center",
+      "ingredients": [
+        {
+          "id": "material:plastic",
+          "name": "Plastic",
+          "qty": 1.0,
+          "known": true
+        },
+        {
+          "id": "material:steel",
+          "name": "Steel",
+          "qty": 1.0,
+          "known": true
+        }
+      ],
+      "complete": true
+    },
+    {
+      "itemId": "item:RC-016",
+      "itemName": "Industrial Blades",
+      "bench": "Recycle Center",
+      "ingredients": [
+        {
+          "id": "material:plastic",
+          "name": "Plastic",
+          "qty": 2.0,
+          "known": true
+        },
+        {
+          "id": "material:rubber",
+          "name": "Rubber",
+          "qty": 2.0,
+          "known": true
+        }
+      ],
+      "complete": true
     }
   ]
 }
