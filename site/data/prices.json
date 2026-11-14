@@ -1,7 +1,7 @@
 {
   "brand": "Icy Rose Exchange",
   "source": "prices.xlsx",
-  "generatedAt": "2026-11-14T01:04:05+00:00",
+  "generatedAt": "2026-11-14T07:37:33+00:00",
   "defaultBuyPercent": 0.5,
   "cash": {
     "stackValue": 1250.0,
@@ -856,7 +856,7 @@
       "group": "Materials",
       "type": "material",
       "canSell": true,
-      "canBuy": true,
+      "canBuy": false,
       "craftCost": null,
       "materialCost": 10.0,
       "customSellPrice": null,
