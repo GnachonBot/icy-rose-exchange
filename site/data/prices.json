@@ -1,7 +1,7 @@
 {
   "brand": "Icy Rose Exchange",
   "source": "prices.xlsx",
-  "generatedAt": "2026-11-18T02:14:40+00:00",
+  "generatedAt": "2026-11-18T10:20:34+00:00",
   "defaultBuyPercent": 0.5,
   "cash": {
     "stackValue": 1250.0,
@@ -1381,6 +1381,25 @@
       "shopPrice": 75.0,
       "hasShopOverride": false,
       "displayName": "Bandge (50%)"
+    },
+    {
+      "id": "material:user-3198da67-79d",
+      "name": "Test",
+      "group": "Materials",
+      "type": "material",
+      "canSell": true,
+      "canBuy": true,
+      "craftCost": null,
+      "materialCost": 0.0,
+      "customSellPrice": null,
+      "shopSellOverride": null,
+      "sellPrice": 0.0,
+      "buyPrice": null,
+      "priceSource": "material",
+      "buySource": "not set",
+      "shopPrice": 0.0,
+      "hasShopOverride": false,
+      "displayName": "Test"
     }
   ],
   "recipes": [
