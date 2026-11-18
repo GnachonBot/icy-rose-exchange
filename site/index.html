@@ -9,9 +9,11 @@
     <link rel="icon" href="assets/favicon.svg" type="image/svg+xml" />
     <link rel="stylesheet" href="styles.css" />
     <script src="config.js" defer></script>
+    <script src="auth.js" defer></script>
     <script src="catalogue.js" defer></script>
     <script src="operations.js" defer></script>
     <script src="admin.js" defer></script>
+    <script src="users.js" defer></script>
     <script src="app.js" defer></script>
   </head>
   <body>
@@ -29,6 +31,7 @@
           <button class="nav-item" data-view="cash" type="button"><span class="nav-icon" aria-hidden="true">＄</span><span>Cash Calculator</span><span class="nav-arrow">›</span></button>
           <button class="nav-item" data-view="prices" type="button"><span class="nav-icon" aria-hidden="true">≡</span><span>Items & Prices</span><span class="nav-arrow">›</span></button>
           <button class="nav-item" data-view="admin" type="button"><span class="nav-icon" aria-hidden="true">⚙</span><span>Manage Items</span><span class="nav-arrow">›</span></button>
+          <button class="nav-item" data-view="users" type="button"><span class="nav-icon" aria-hidden="true">♙</span><span>Manage Staff</span><span class="nav-arrow">›</span></button>
         </nav>
         <div class="sidebar-footer">
           <div class="source-pill"><span class="live-dot"></span> EXCEL-POWERED PRICES</div>
@@ -48,5 +51,11 @@
       </div>
     </div>
     <div id="toast" class="toast" role="status" aria-live="polite"></div>
+    <div id="auth-screen" class="auth-screen" hidden>
+      <div class="auth-layout">
+        <div class="auth-brand"><img src="assets/icy-rose-logo.png" alt="Icy Rose Exchange" /><p>YOUR SHOP. YOUR TEAM. ONE ACCOUNT EACH.</p></div>
+        <section id="auth-panel" class="auth-panel" aria-label="Staff sign in"></section>
+      </div>
+    </div>
   </body>
 </html>

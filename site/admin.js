@@ -93,15 +93,7 @@ function drawAdminPicker(){
   // Do not replace or refocus #admin-search. The cursor stays where staff put it.
 }
 function renderAdmin(){
-  if(!staffPin){
-    APP.innerHTML=heading(VIEWS.admin)+`<section class="card unlock-card"><div class="card-body"><div class="eyebrow">STAFF ONLY</div><h2>Unlock Price &amp; Item Manager</h2><p class="card-subtitle">Use the same staff passphrase as Inventory and Discord receipts. We won't save it on this device.</p><form id="admin-unlock" class="unlock-row"><input id="admin-pin" class="input" type="password" autocomplete="off" required placeholder="Staff passphrase"/><button class="btn btn-primary">Unlock editor</button></form><p class="hint">Editing requires the catalogue D1 migration and updated Cloudflare Worker.</p></div></section>`;
-    document.getElementById('admin-unlock').onsubmit=async e=>{
-      e.preventDefault();const button=e.submitter;button.disabled=true;
-      try{const pin=document.getElementById('admin-pin').value;const result=await cloud('/catalogue/history','GET',null,pin);staffPin=pin;adminHistory=result.history||[];renderAdmin();}
-      catch(err){notify(err.message);button.disabled=false;}
-    };
-    return;
-  }
+  if(!IcyAuth.isAdmin()){notify('Admins only.');setView('pawn');return;}
   const chosen=adminItem();
   const categories=adminCategories();
   if(adminCategory!=='All'&&!categories.some(x=>x.group===adminCategory))adminCategory='All';

@@ -7,7 +7,8 @@ const VIEWS = {
   inventory: { title: "Inventory", eyebrow: "SHOP / SHARED STOCK", subtitle: "Count finished goods and materials. Sales deduct stock, purchases add stock, and crafting uses materials.", chip: "Shared through Cloudflare" },
   cash: { title: "Cash Calculator", eyebrow: "SHOP / CASH COUNTER", subtitle: "Count Stacks and Rolls together, even when each one has a different value.", chip: "Two cash types" },
   prices: { title: "Items & Prices", eyebrow: "SHOP / LIVE PRICE LIST", subtitle: "Browse every item and material, including live updates saved by staff.", chip: "Cloudflare + Excel" },
-  admin: { title: "Manage Items", eyebrow: "SHOP / STAFF ADMIN", subtitle: "Update buying and selling prices, add products, edit recipes and track changes.", chip: "Staff only" }
+  admin: { title: "Manage Items", eyebrow: "SHOP / STAFF ADMIN", subtitle: "Update buying and selling prices, add products, edit recipes and track changes.", chip: "Admins only" },
+  users: { title: "Manage Staff", eyebrow: "SHOP / ACCOUNT SETTINGS", subtitle: "Control employee accounts, access and password resets.", chip: "Admins only" }
 };
 
 let data = null;
@@ -90,6 +91,7 @@ function metric(title,value,description="") {
 }
 function setView(name) {
   if (!data || !VIEWS[name]) return;
+  if(!IcyAuth.isAdmin() && !["pawn","buying"].includes(name)){notify("Admins only.");return;}
   currentView=name;
   document.querySelectorAll(".nav-item").forEach(x=>{
     x.classList.toggle("selected", x.dataset.view===name);
@@ -101,6 +103,7 @@ function setView(name) {
   else if(name==="inventory") renderInventory();
   else if(name==="cash") renderCash();
   else if(name==="admin") renderAdmin();
+  else if(name==="users") IcyUsers.render();
   else renderPrices();
 }
 
@@ -150,9 +153,7 @@ function renderCart(mode) {
         <div class="checkout"><div class="form-label">${label}</div><div class="checkout-total ${isPawn?"money-ice":"money-rose"}">${currency(summary.total)}</div>
           <div class="summary-rows"><div class="summary-row"><span>Item lines</span><strong>${summary.lines.length}</strong></div><div class="summary-row"><span>Total units</span><strong>${summary.units}</strong></div><div class="summary-row"><span>Unpriced items</span><strong>${summary.unset}</strong></div></div>
           <div class="receipt-controls">
-            <label class="form-label" for="receipt-pin">Staff receipt passphrase</label>
-            <input id="receipt-pin" class="input" type="password" autocomplete="off" placeholder="Enter passphrase to send" aria-describedby="receipt-help" />
-            <p class="hint" id="receipt-help">${receiptEndpoint ? "Complete an order to post its receipt to Discord. Passphrase is never saved." : "Discord isn't connected yet. Set your Worker URL in site/config.js."}</p>
+            <p class="hint" id="receipt-help">${receiptEndpoint ? `Signed in as <strong>${IcyAuth.currentUser()?.name||'Staff'}</strong>. Your name appears on the Discord receipt automatically.` : "Discord isn't connected yet. Set your Worker URL in site/config.js."}</p>
           </div>
           <div class="checkout-actions"><button type="button" id="complete-order" class="btn btn-primary" ${receiptEndpoint ? "" : "disabled"}>✓ Complete order &amp; send receipt</button><button type="button" id="copy-receipt" class="btn btn-ice">Copy order</button><button type="button" id="clear-cart" class="btn btn-danger">Clear cart</button></div>
         </div>
@@ -220,9 +221,6 @@ async function completeOrder(mode) {
     notify("Set a valid quantity and price for every item before completing."); return;
   }
   if (!receiptEndpoint) { notify("Discord isn't connected. Set the Worker URL in site/config.js."); return; }
-  const passphraseInput = document.getElementById("receipt-pin");
-  const passphrase = passphraseInput?.value || "";
-  if (!passphrase.trim()) { notify("Enter your staff receipt passphrase first."); passphraseInput?.focus(); return; }
   if (!confirm(`Complete this ${mode === "pawn" ? "customer sale" : "customer purchase"} for ${currency(summary.total)} and post a receipt in Discord?`)) return;
 
   const button = document.getElementById("complete-order");
@@ -240,21 +238,21 @@ async function completeOrder(mode) {
   try {
     const response = await fetch(receiptEndpoint, {
       method: "POST",
-      headers: {"Content-Type": "application/json", "X-Receipt-Pin": passphrase},
+      headers: {"Content-Type": "application/json", ...IcyAuth.headers()},
       body: JSON.stringify(payload),
       signal: AbortSignal.timeout(15000)
     });
     let result = {};
     try { result = await response.json(); } catch {}
+    if(response.status===401){IcyAuth.expired();throw new Error('Your session expired. Sign in again.');}
     if (!response.ok || !result.ok) throw new Error(result.error || `Server returned ${response.status}`);
-    staffPin = passphrase;
     // Stock updates and Discord posting are reported separately by the Worker.
     const cart = cartFor(mode);
     cart.length = 0;
     resetPendingReceipt(mode);
     persist();
     setView(mode);
-    if(result.stockUpdated && staffPin){try{await loadRemoteStock();}catch{}}
+    if(result.stockUpdated && IcyAuth.isAdmin()){try{await loadRemoteStock();}catch{}}
     notify(result.discordPosted ? `Order complete! Discord receipt sent; inventory updated.` :
       `Order completed${result.stockUpdated?" and stock updated":""}, but Discord was not confirmed. Check the channel.`);
   } catch (error) {
@@ -272,7 +270,7 @@ async function copyReceipt(mode) {
   const sum=cartMetrics(mode);
   if(!sum.lines.length){notify("Add items before copying an order.");return;}
   const rows=sum.lines.map(l=>`${l.item.displayName} × ${l.qty} @ ${currency(l.unit)} = ${currency(l.total)}`);
-  const message=`ICY ROSE EXCHANGE — ${mode==="pawn"?"SALE":"BUYING ORDER"}\n${rows.join("\n")}\n\n${mode==="pawn"?"TOTAL TO CHARGE":"TOTAL TO PAY"}: ${currency(sum.total)}`;
+  const message=`ICY ROSE EXCHANGE — ${mode==="pawn"?"SALE":"BUYING ORDER"}\n${rows.join("\n")}\n\n${mode==="pawn"?"TOTAL TO CHARGE":"TOTAL TO PAY"}: ${currency(sum.total)}\nPrepared by: ${IcyAuth.currentUser()?.name||'Staff'}`;
   try {await navigator.clipboard.writeText(message);notify("Order copied to clipboard");} catch {notify("Clipboard access unavailable here. Use HTTPS / GitHub Pages.");}
 }
 function renderCash() {
@@ -335,7 +333,8 @@ function drawPriceTable() {
 async function refreshCatalogue(render=false){
   let edits=[];
   if(remoteBase){
-    const response=await fetch(remoteBase+'/catalogue/changes',{cache:'no-store'});
+    const response=await fetch(remoteBase+'/catalogue/changes',{cache:'no-store',headers:IcyAuth.headers()});
+    if(response.status===401){IcyAuth.expired();return;}
     if(response.ok){const result=await response.json();edits=result.edits||[];}
     else if(response.status!==404)throw Error('Live catalogue could not be loaded. Please check Cloudflare.');
   }
@@ -351,6 +350,10 @@ async function refreshCatalogue(render=false){
 }
 async function init() {
   try {
+    await IcyAuth.start();
+    document.querySelectorAll('.nav-item').forEach(b=>{if(!IcyAuth.isAdmin()&&!['pawn','buying'].includes(b.dataset.view))b.hidden=true;});
+    IcyAuth.attachHeader();
+    if(!IcyAuth.isAdmin()){const hint=document.querySelector('.sidebar-footer p');if(hint)hint.textContent='Complete customer sales and buying orders using your signed-in account.';}
     const res=await fetch("data/prices.json",{cache:"no-store"});
     if(!res.ok)throw new Error(`HTTP ${res.status}`);
     workbookData=await res.json();

@@ -1,7 +1,6 @@
 "use strict";
 // All shared inventory/order information lives in Cloudflare D1, not localStorage.
-// Staff passphrases are kept in memory for this open tab only.
-let staffPin="";
+// Cloudflare authenticates each request with the signed-in employee session.
 let remoteReady=false;
 let remoteInventory=new Map();
 let remoteOrders=[];
@@ -21,13 +20,14 @@ function reservedStock(id){
 function availableStock(id){return Math.max(0,stockOf(id)-reservedStock(id));}
 function recipeFor(id){return (data?.recipes||[]).find(r=>r.itemId===id);}
 function randomId(){return crypto.randomUUID();}
-async function cloud(path,method="GET",payload=null,pin=staffPin){
+async function cloud(path,method="GET",payload=null){
   if(!remoteBase)throw Error("Configure your Cloudflare Worker URL in site/config.js first.");
   const response=await fetch(remoteBase+path,{
-    method,headers:{"Content-Type":"application/json","X-Receipt-Pin":pin},
+    method,headers:{"Content-Type":"application/json",...IcyAuth.headers()},
     ...(payload?{body:JSON.stringify(payload)}:{}),signal:AbortSignal.timeout(16000)
   });
   const out=await response.json().catch(()=>({}));
+  if(response.status===401){IcyAuth.expired();throw Error("Your session expired. Sign in again.");}
   if(!response.ok||!out.ok)throw Error(out.error||`Request failed: ${response.status}`);
   return out;
 }
@@ -39,21 +39,15 @@ async function loadRemoteStock(){
   return result;
 }
 function lockPanel(name){
-  APP.innerHTML=heading(VIEWS[name])+`<section class="card unlock-card"><div class="card-body">
-    <div class="eyebrow">STAFF ACCESS</div><h2>Unlock shared ${name==='bulk'?'orders':'inventory'}</h2>
-    <p class="card-subtitle">Use the same staff passphrase you already use for Discord receipts. Your password is not saved.</p>
-    <form id="unlock-form" class="unlock-row"><input id="unlock-pin" type="password" autocomplete="off" class="input" placeholder="Staff passphrase" required />
-    <button type="submit" class="btn btn-primary">Unlock & sync</button></form>
-    <p class="hint">This needs your Cloudflare Worker connected to a D1 database. The existing receipt webhook remains in place.</p>
-  </div></section>`;
-  document.getElementById('unlock-form').addEventListener('submit',async e=>{
-    e.preventDefault();if(loadingOperations)return;
-    const pass=document.getElementById('unlock-pin').value;
-    loadingOperations=true;const button=e.target.querySelector('button');button.disabled=true;button.textContent='Connecting…';
-    try{staffPin=pass;await loadRemoteStock();setView(name);notify('Shared stock and orders loaded');}
-    catch(err){staffPin='';remoteReady=false;notify(err.message);button.disabled=false;button.textContent='Unlock & sync';}
+  APP.innerHTML=heading(VIEWS[name])+`<section class="card unlock-card"><div class="card-body"><div class="eyebrow">CLOUDFLARE STOCK</div><h2>Loading shared ${name==='bulk'?'orders':'inventory'}…</h2>
+    <p class="card-subtitle" id="stock-load-status">Your admin account provides access automatically; no staff passphrase is needed.</p>
+    <button type="button" id="stock-retry" class="btn btn-ice">Retry connection</button></div></section>`;
+  const retry=document.getElementById('stock-retry');
+  async function doLoad(){if(loadingOperations)return;loadingOperations=true;retry.disabled=true;
+    try{await loadRemoteStock();setView(name);}catch(err){document.getElementById('stock-load-status').textContent=err.message;retry.disabled=false;}
     finally{loadingOperations=false;}
-  });
+  }
+  retry.onclick=doLoad;doLoad();
 }
 async function syncAndShow(name){
   await loadRemoteStock();setView(name);
@@ -187,7 +181,7 @@ function drawInventory(){
 async function setInventoryAvailability(id,flag,enabled){
   if(!['canBuy','canSell'].includes(flag)||inventoryAvailabilitySaving.has(id))return;
   const product=lookup.get(id);
-  if(!product||!staffPin){notify('Unlock Inventory before editing availability.');return;}
+  if(!product||!IcyAuth.isAdmin()){notify('Admin access required.');return;}
   const saved=data.catalogueEdits?.find(x=>x.id===id);
   const edit=saved?.edit?structuredClone(saved.edit):baseEdit(product);
   if(!edit){notify('Could not load that product. Refresh and try again.');return;}
