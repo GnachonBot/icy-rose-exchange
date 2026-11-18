@@ -50,8 +50,8 @@ window.IcyAuth = (() => {
       <p class="auth-copy">${required?'Welcome '+escape(user?.name||'')+'. Set your own password before entering the shop.':'Your current sign-in will stay active.'}</p>
       <form id="auth-change-form" class="auth-form">
         ${required?'':'<label for="auth-current">Current password</label><input id="auth-current" class="input" type="password" autocomplete="current-password" required />'}
-        <label for="auth-new">New password (12+ characters)</label><input id="auth-new" class="input" type="password" minlength="12" maxlength="128" autocomplete="new-password" required />
-        <label for="auth-confirm">Confirm new password</label><input id="auth-confirm" class="input" type="password" minlength="12" maxlength="128" autocomplete="new-password" required />
+        <label for="auth-new">New password (6+ characters)</label><input id="auth-new" class="input" type="password" minlength="6" maxlength="128" autocomplete="new-password" required />
+        <label for="auth-confirm">Confirm new password</label><input id="auth-confirm" class="input" type="password" minlength="6" maxlength="128" autocomplete="new-password" required />
         <button class="btn btn-primary" type="submit">Save personal password</button>
         ${required?'':'<button id="auth-cancel" class="btn btn-ice" type="button">Cancel</button>'}
         <p id="auth-notice" class="auth-error" role="alert"></p>
