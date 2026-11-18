@@ -1,5 +1,5 @@
 // Per-user authentication: never store passwords or session tokens in public GitHub files.
-const AUTH_ITERATIONS = 310000;
+const AUTH_ITERATIONS = 100000;
 const AUTH_SESSION_SECONDS = 12 * 3600;
 const AUTH_FIRST_LOGIN_SECONDS = 15 * 60;
 const AUTH_MAX_FAILURES = 7;
