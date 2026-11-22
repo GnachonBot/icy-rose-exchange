@@ -1,7 +1,7 @@
 {
   "brand": "Icy Rose Exchange",
   "source": "prices.xlsx",
-  "generatedAt": "2026-11-22T14:49:02+00:00",
+  "generatedAt": "2026-11-22T20:57:41+00:00",
   "defaultBuyPercent": 0.5,
   "cash": {
     "stackValue": 1250.0,
