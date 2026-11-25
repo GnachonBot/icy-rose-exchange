@@ -20,7 +20,7 @@ function authValidName(name){
   return name;
 }
 function authValidPassword(password){
-  assert(typeof password==='string'&&password.length>=12&&password.length<=128,'Password must be 12–128 characters');
+  assert(typeof password==='string'&&password.length>=6&&password.length<=128,'Password must be 6–128 characters');
   return password;
 }
 async function getAuthSession(env,request){
@@ -50,7 +50,7 @@ async function authLogin(env,body,origin){
   if(u.password_hash&&u.password_salt){
     const hash=await authHash(password,u.password_salt,u.iterations||AUTH_ITERATIONS);
     valid=constantTimeEqual(hash,u.password_hash);
-  }else if(env.AUTH_BOOTSTRAP_CODE && String(env.AUTH_BOOTSTRAP_CODE).length>=16){
+  }else if(env.AUTH_BOOTSTRAP_CODE && String(env.AUTH_BOOTSTRAP_CODE).length>=8){
     valid=constantTimeEqual(password,String(env.AUTH_BOOTSTRAP_CODE));
   }
   if(!valid){
@@ -189,18 +189,21 @@ function verifyTotal(lines,total){
   return cents;
 }
 function embedLines(lines){return lines.map(l=>`• **${l.name}** × ${l.qty} @ ${money(l.unitCents)} = **${money(l.lineCents)}**`).join('\n');}
-function receiptMessage(lines,kind,totalCents,receiptId,operator){
-  const isSale=kind==='pawn',description=embedLines(lines);
+function receiptMessage(lines,kind,totalCents,receiptId,operator,fundSource='shop'){
+  const isSale=kind==='pawn',isPersonal=fundSource==='personal',description=embedLines(lines);
   assert(description.length<=3900,'Too many item names for a single Discord receipt');
   return {username:'Icy Rose Exchange',allowed_mentions:{parse:[]},embeds:[{
-    title:isSale?'🧾 Pawn Shop — Completed Sale':'🧾 Buying Calculator — Completed Purchase',
-    color:isSale?6741745:16729454,description,
+    title:isPersonal
+      ? (isSale?'👤 PERSONAL CHECKOUT — Completed Sale':'👤 PERSONAL CHECKOUT — Completed Purchase')
+      : (isSale?'🧾 Pawn Shop — Completed Sale':'🧾 Buying Calculator — Completed Purchase'),
+    color:isPersonal?6477291:isSale?6741745:16729454,description,
     fields:[
       {name:isSale?'Customer paid':'Paid to customer',value:`**${money(totalCents)}**`,inline:true},
       {name:'Total units',value:String(lines.reduce((n,l)=>n+l.qty,0)),inline:true},
+      {name:'Money handled by',value:isPersonal?`**Personal — ${safe(operator,55)}**`:'**Pawn Shop**',inline:true},
       {name:'Processed by',value:safe(operator,60),inline:true},
       {name:'Receipt ID',value:`\`${receiptId}\``,inline:false}
-    ],footer:{text:'Icy Rose Exchange • Stock updated through shop website'},timestamp:new Date().toISOString()
+    ],footer:{text:'Icy Rose Exchange • Shared stock updated • Personal/shop money recorded separately'},timestamp:new Date().toISOString()
   }]};
 }
 function requirementLines(reqs){
@@ -304,10 +307,12 @@ async function getState(env){
 }
 async function handleReceipt(env,body,origin,session){
   assert(body?.kind==='pawn'||body?.kind==='buying','Invalid receipt type');
+  const fundSource=body.fundSource===undefined?'shop':body.fundSource;
+  assert(fundSource==='shop'||fundSource==='personal','Invalid checkout funding');
   const lines=validateItems(body.items),cents=verifyTotal(lines,body.clientTotal);
   await checkActiveOffers(env,lines,body.kind==='pawn'?'canSell':'canBuy');
   const id=uniqueId(body.orderId);
-  const message=receiptMessage(lines,body.kind,cents,id,session.user.username); // validate Discord limits before recording stock
+  const message=receiptMessage(lines,body.kind,cents,id,session.user.username,fundSource); // validate Discord limits before recording stock
   let saved=false;
   if(env.DB){
     try {
@@ -325,7 +330,7 @@ async function handleReceipt(env,body,origin,session){
   const sent=await sendDiscord(env,message);
   if(saved){
     await env.DB.prepare('UPDATE shop_receipts SET discord_status=? WHERE id=?').bind(sent?'posted':'failed',id).run();
-    await authRecord(env,session,'receipt',id);
+    await authRecord(env,session,fundSource==='personal'?'receipt-personal':'receipt',id);
   }
   // With no DB the old Discord-only relay still works, but say so explicitly.
   if(!saved&&!sent)return json({ok:false,error:'Discord delivery failed'},502,origin);
@@ -535,12 +540,13 @@ export default {
     const methods={
       '/auth/login':'POST','/auth/me':'GET','/auth/password':'POST','/auth/logout':'POST',
       '/auth/users':'GET','/auth/users/add':'POST','/auth/users/update':'POST','/auth/users/reset':'POST',
-      '/receipt':'POST','/state':'GET','/inventory/adjust':'POST','/inventory/craft':'POST',
+      '/receipt':'POST','/checkout/capabilities':'GET','/state':'GET','/inventory/adjust':'POST','/inventory/craft':'POST',
       '/bulk-orders':'POST','/bulk-orders/status':'POST','/inventory/post-materials':'POST',
       '/catalogue/changes':'GET','/catalogue/edit':'POST','/catalogue/history':'GET','/catalogue/restore':'POST'
     };
     if(!(path in methods))return json({ok:false,error:'Not found'},404,origin);
     if(methods[path]!==request.method)return json({ok:false,error:'Method not allowed'},405,origin);
+    if(path==='/checkout/capabilities')return json({ok:true,personalCheckout:true},200,origin);
     if(!env.DB)return json({ok:false,error:'D1 binding DB is required for sign-in'},503,origin);
     try{
       if(path==='/auth/login')return await authLogin(env,await readBody(request),origin);
