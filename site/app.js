@@ -304,7 +304,7 @@ async function completeOrder(mode,fundSource="shop") {
     notify(`Receipt not confirmed: ${error.message || "Connection failed"}. Cart kept.`);
     // If the network drops after Discord accepted the receipt, checking the
     // channel before retrying avoids a possible duplicate.
-    buttons.forEach(b=>{if(b)b.disabled=false;});
+    buttons.forEach(b=>{if(b)b.disabled=(b.id==="complete-personal"?!personalCheckoutSupported:!receiptEndpoint);});
     activeButton.textContent = personal ? "♙ Personal Checkout" : "✓ Shop Checkout";
   } finally {
     orderPosting = false;
