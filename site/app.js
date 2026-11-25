@@ -19,11 +19,30 @@ let lookup = new Map();
 let currentView = "pawn";
 let toastTimer;
 let orderPosting = false;
+let personalCheckoutSupported = false;
 const RECEIPT_LIMIT = 50;
 const MAX_RECEIPT_QTY = 10000;
 const MAX_RECEIPT_PRICE = 10000000;
 const receiptEndpoint = String(window.ICY_ROSE_CONFIG?.receiptEndpoint || "").trim();
 const APP = document.getElementById("app");
+
+// Older Workers ignore funding type; disable personal checkout until compatibility is verified.
+async function checkPersonalCheckoutSupport(){
+  personalCheckoutSupported=false;
+  if(receiptEndpoint){
+    try{
+      const base=receiptEndpoint.replace(/\/receipt\/?$/,"").replace(/\/$/,"");
+      const response=await fetch(base+"/checkout/capabilities",{cache:"no-store",signal:AbortSignal.timeout(6000)});
+      const info=await response.json();
+      personalCheckoutSupported=response.ok&&info?.ok===true&&info?.personalCheckout===true;
+    }catch(error){console.warn("Personal checkout unavailable until Worker is updated",error);}
+  }
+  const button=document.getElementById("complete-personal");
+  if(button){
+    button.disabled=!personalCheckoutSupported;
+    button.title=personalCheckoutSupported?"Use your own money":"Requires the updated Cloudflare Worker";
+  }
+}
 
 const localKey = "icy-rose-shop-v1";
 let saved = {};
@@ -37,12 +56,13 @@ const state = {
   bulkNotes: saved.bulkNotes || "",
   bulkRequestId: saved.bulkRequestId || null,
   pendingReceiptIds: saved.pendingReceiptIds || {},
+  pendingReceiptFunding: saved.pendingReceiptFunding || {},
   priceFilter: "All",
   priceSearch: ""
 };
 
 function persist() {
-  try { localStorage.setItem(localKey, JSON.stringify({pawnCart:state.pawnCart,buyingCart:state.buyingCart,cash:state.cash,bulkDraft:state.bulkDraft,bulkCustomer:state.bulkCustomer,bulkNotes:state.bulkNotes,bulkRequestId:state.bulkRequestId,pendingReceiptIds:state.pendingReceiptIds})); } catch {}
+  try { localStorage.setItem(localKey, JSON.stringify({pawnCart:state.pawnCart,buyingCart:state.buyingCart,cash:state.cash,bulkDraft:state.bulkDraft,bulkCustomer:state.bulkCustomer,bulkNotes:state.bulkNotes,bulkRequestId:state.bulkRequestId,pendingReceiptIds:state.pendingReceiptIds,pendingReceiptFunding:state.pendingReceiptFunding})); } catch {}
 }
 function currency(num) {
   if (num === null || num === undefined || !Number.isFinite(Number(num))) return "Not set";
@@ -70,7 +90,10 @@ function priceFor(product, mode) {
   return mode === "pawn" ? product.shopPrice : product.buyPrice;
 }
 function cartFor(mode) { return mode === "pawn" ? state.pawnCart : state.buyingCart; }
-function resetPendingReceipt(mode) { delete state.pendingReceiptIds[mode]; }
+function resetPendingReceipt(mode) {
+  delete state.pendingReceiptIds[mode];
+  delete state.pendingReceiptFunding[mode];
+}
 function getLine(mode, entry) {
   const item=lookup.get(entry.id);
   if (!item || !canTransact(item,mode)) return null;
@@ -155,7 +178,12 @@ function renderCart(mode) {
           <div class="receipt-controls">
             <p class="hint" id="receipt-help">${receiptEndpoint ? `Signed in as <strong>${IcyAuth.currentUser()?.name||'Staff'}</strong>. Your name appears on the Discord receipt automatically.` : "Discord isn't connected yet. Set your Worker URL in site/config.js."}</p>
           </div>
-          <div class="checkout-actions"><button type="button" id="complete-order" class="btn btn-primary" ${receiptEndpoint ? "" : "disabled"}>✓ Complete order &amp; send receipt</button><button type="button" id="copy-receipt" class="btn btn-ice">Copy order</button><button type="button" id="clear-cart" class="btn btn-danger">Clear cart</button></div>
+          <div class="checkout-actions">
+            <button type="button" id="complete-order" class="btn btn-primary" ${receiptEndpoint ? "" : "disabled"}>✓ Shop Checkout</button>
+            <button type="button" id="complete-personal" class="btn btn-personal" ${receiptEndpoint && personalCheckoutSupported ? "" : "disabled"} title="${personalCheckoutSupported ? "Use your own money" : "Requires the updated Cloudflare Worker"}">♙ Personal Checkout</button>
+            <p class="checkout-funds-note">Personal checkout uses your own money or pays you personally. Both checkouts change the same shared stock and send a receipt.</p>
+            <button type="button" id="copy-receipt" class="btn btn-ice">Copy order</button><button type="button" id="clear-cart" class="btn btn-danger">Clear cart</button>
+          </div>
         </div>
       </aside>
     </div>`;
@@ -176,7 +204,8 @@ function renderCart(mode) {
     cartFor(mode).length=0;resetPendingReceipt(mode);persist();setView(mode);notify("Cart cleared");
   });
   document.getElementById("copy-receipt").addEventListener("click",()=>copyReceipt(mode));
-  document.getElementById("complete-order").addEventListener("click",()=>completeOrder(mode));
+  document.getElementById("complete-order").addEventListener("click",()=>completeOrder(mode,"shop"));
+  document.getElementById("complete-personal").addEventListener("click",()=>completeOrder(mode,"personal"));
   renderCartTable(mode);
 }
 function renderCartTable(mode) {
@@ -211,8 +240,15 @@ function renderCartTable(mode) {
   table.append(tbody);scroll.append(table);holder.append(scroll);
   holder.append(node("p","hint","Custom price is optional and applies only to this order, not to the workbook."));
 }
-async function completeOrder(mode) {
+async function completeOrder(mode,fundSource="shop") {
   if (orderPosting) return;
+  if(fundSource!=="shop"&&fundSource!=="personal")return;
+  if(fundSource==="personal"&&!personalCheckoutSupported){notify("Personal checkout requires the updated Cloudflare Worker.");return;}
+  const lockedFunding=state.pendingReceiptFunding[mode] || "shop";
+  if(state.pendingReceiptIds[mode] && lockedFunding!==fundSource){
+    notify(`This cart already has a pending ${lockedFunding} checkout. Retry that button first, or change the cart to start a new order.`);
+    return;
+  }
   const summary = cartMetrics(mode);
   if (!summary.lines.length) { notify("Add items before completing an order."); return; }
   if(summary.lines.some(l=>!canTransact(l.item,mode))){notify('A product is no longer available for this transaction. Refresh the cart.');return;}
@@ -221,16 +257,25 @@ async function completeOrder(mode) {
     notify("Set a valid quantity and price for every item before completing."); return;
   }
   if (!receiptEndpoint) { notify("Discord isn't connected. Set the Worker URL in site/config.js."); return; }
-  if (!confirm(`Complete this ${mode === "pawn" ? "customer sale" : "customer purchase"} for ${currency(summary.total)} and post a receipt in Discord?`)) return;
+  const personal=fundSource==="personal";
+  const operator=IcyAuth.currentUser()?.name || "Staff";
+  const fundsText=personal
+    ? (mode==="pawn" ? `Customer's payment goes personally to ${operator}.` : `${operator} pays from their own money.`)
+    : (mode==="pawn" ? "Customer's payment goes to the Pawn Shop." : "The Pawn Shop pays the customer.");
+  const stockText=mode==="pawn" ? "Shared stock will decrease." : "Shared stock will increase.";
+  if (!confirm(`${personal?"PERSONAL":"SHOP"} CHECKOUT — ${mode==="pawn"?"SALE":"PURCHASE"}\n\n${fundsText}\n${stockText}\nTotal: ${currency(summary.total)}\n\nComplete and send the Discord receipt?`)) return;
 
-  const button = document.getElementById("complete-order");
+  const buttons=[document.getElementById("complete-order"),document.getElementById("complete-personal")];
   orderPosting = true;
-  button.disabled = true;
-  button.textContent = "Sending receipt…";
+  buttons.forEach(b=>{if(b)b.disabled=true;});
+  const activeButton=document.getElementById(personal?"complete-personal":"complete-order");
+  activeButton.textContent = "Sending receipt…";
   state.pendingReceiptIds[mode] ||= crypto.randomUUID();
+  state.pendingReceiptFunding[mode]=fundSource;
   persist();
   const payload = {
     kind: mode,
+    fundSource,
     orderId: state.pendingReceiptIds[mode],
     items: summary.lines.map(l => ({id:l.item.id, name: l.item.displayName, qty: l.qty, unitPrice: Math.round(l.unit * 100) / 100})),
     clientTotal: Math.round(summary.total * 100) / 100
@@ -253,14 +298,14 @@ async function completeOrder(mode) {
     persist();
     setView(mode);
     if(result.stockUpdated && IcyAuth.isAdmin()){try{await loadRemoteStock();}catch{}}
-    notify(result.discordPosted ? `Order complete! Discord receipt sent; inventory updated.` :
-      `Order completed${result.stockUpdated?" and stock updated":""}, but Discord was not confirmed. Check the channel.`);
+    notify(result.discordPosted ? `${personal?"Personal":"Shop"} checkout complete! Receipt sent; shared stock updated.` :
+      `${personal?"Personal":"Shop"} checkout completed${result.stockUpdated?" and shared stock updated":""}, but Discord was not confirmed. Check the channel.`);
   } catch (error) {
     notify(`Receipt not confirmed: ${error.message || "Connection failed"}. Cart kept.`);
     // If the network drops after Discord accepted the receipt, checking the
     // channel before retrying avoids a possible duplicate.
-    button.disabled = false;
-    button.textContent = "✓ Complete order & send receipt";
+    buttons.forEach(b=>{if(b)b.disabled=false;});
+    activeButton.textContent = personal ? "♙ Personal Checkout" : "✓ Shop Checkout";
   } finally {
     orderPosting = false;
   }
@@ -369,6 +414,7 @@ async function init() {
     document.getElementById("data-updated").textContent=`Data refreshed ${updated.toLocaleDateString("en-GB",{day:"numeric",month:"short",year:"numeric"})}`;
     document.querySelectorAll("[data-view]").forEach(button=>button.addEventListener("click",()=>setView(button.dataset.view)));
     setView(currentView);
+    void checkPersonalCheckoutSupport();
     // When another staff member edits prices, refresh on the next tab focus.
     window.addEventListener('focus',()=>{
       if(Date.now()-lastCatalogueFetch>30000)refreshCatalogue(true).catch(()=>{});
